@@ -1,0 +1,175 @@
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+  <plugin-info>
+    <description>${project.description}</description>
+    <version>${project.version}</version>
+    <vendor name="${project.organization.name}" url="${project.organization.url}" />
+    <param name="plugin-icon">images/pluginIcon.png</param>
+    <param name="plugin-logo">images/pluginLogo.png</param>
+  </plugin-info>
+
+  <!-- add our i18n resource -->
+  <resource type="i18n" name="i18n" location="/i18n/blueprint-validation"/>
+
+  <web-resource key="space-admin-webresources">
+    <dependency>com.atlassian.auiplugin:ajs</dependency>
+    <resource type="download" name="space-admin.css"    location="/css/space-admin.css"/>
+    <resource type="download" name="space-admin.soy.js" location="/templates/space/space.soy"/>
+    <context>vbp-space-admin</context>
+    <transformation extension="soy">
+      <transformer key="soyTransformer"/>
+    </transformation>
+    <transformation extension="js">
+      <transformer key="jsI18n"/>
+    </transformation>
+  </web-resource>
+
+
+
+  <web-resource key="blueprint-config-resources">
+    <dependency>com.atlassian.auiplugin:ajs</dependency>
+    <resource type="download" name="general.soy.js" location="/templates/general.soy"/>
+    <resource type="download" name="validators.soy.js" location="/templates/config/validators.soy"/>
+    <resource type="download" name="validators.css"    location="/css/validators.css"/>
+    <resource type="download" name="templates.soy.js"  location="/templates/admin/templates.soy"/>
+    <resource type="download" name="templates.css"     location="/css/templates.css"/>
+    <context>vbp-configure</context>
+    <transformation extension="soy">
+      <transformer key="soyTransformer"/>
+    </transformation>
+    <transformation extension="js">
+      <transformer key="jsI18n"/>
+    </transformation>
+  </web-resource>
+
+  <web-resource key="blueprint-validation-resources" name="blueprint-validation Web Resources">
+    <dependency>com.atlassian.auiplugin:ajs</dependency>
+    <resource type="download" name="blueprint-validation.css" location="/css/blueprint-validation.css"/>
+    <resource type="download" name="blueprint-validation.js"  location="/js/blueprint-validation.js"/>
+    <resource type="download" name="autocomplete.js"          location="/js/autocomplete.js"/>
+    <resource type="download" name="autocomplete.soy.js"      location="/templates/autocomplete.soy"/>
+    <resource type="download" name="country.js"               location="/js/modules/country.js"/>
+    <resource type="download" name="currency.js"              location="/js/modules/currency.js"/>
+    <context>editor</context>
+    <transformation extension="soy">
+      <transformer key="soyTransformer"/>
+    </transformation>
+  </web-resource>
+
+  <web-resource key="validator-types">
+    <resource type="download" name="validator-types.js" location="/js/validator-types.js"/>
+    <context>vbp-configure</context>
+    <transformation extension="js">
+      <transformer key="jsI18n"/>
+    </transformation>
+  </web-resource>
+
+  <web-resource key="validation-modes">
+    <resource type="download" name="validation-modes.js" location="/js/validation-modes.js"/>
+    <context>vbp-validation-modes</context>
+    <transformation extension="js">
+      <transformer key="jsI18n"/>
+    </transformation>
+  </web-resource>
+
+  <web-resource key="locale-strings">
+    <resource type="download" name="locale-strings.js" location="/js/locale-strings.js"/>
+    <context>vbp-locale-strings</context>
+    <transformation extension="js">
+      <transformer key="jsI18n"/>
+    </transformation>
+  </web-resource>
+
+  <servlet-filter key="vbp-create-draft-filter" class="com.mesilat.vbp.servlet.CreateDraftServletFilter" location="before-dispatch" weight="100">
+    <url-pattern>/rest/create-dialog/1.0/content-blueprint/create-draft</url-pattern>
+  </servlet-filter>
+  <servlet-filter key="bvp-create-page-filter" class="com.mesilat.vbp.servlet.CreateFromBlueprintServletFilter" location="before-dispatch" weight="100">
+    <url-pattern>/rest/api/content/blueprint/instance/*</url-pattern>
+  </servlet-filter>
+
+  <servlet-filter key="vbp-page-create" class="com.mesilat.vbp.servlet.CreateFromTemplateServletFilter" location="before-dispatch" weight="100">
+    <url-pattern>/rest/api/content</url-pattern>
+  </servlet-filter>
+  <servlet-filter key="bvp-edit-content-filter" class="com.mesilat.vbp.servlet.EditContentServletFilter" location="before-dispatch" weight="1">
+    <url-pattern>/rest/api/content/*</url-pattern>
+  </servlet-filter>
+
+  <rest key="rest" path="/blueprint-validation" version="1.0" />
+
+  <web-section key="blueprint-validation" name="Blueprint Validation" location="system.admin" weight="700">
+    <label key="vbp.admin.menu.section.label"/>
+  </web-section>
+  <web-item key="vbp-configure-validators" section="system.admin/blueprint-validation" weight="10">
+    <description key="vbp.admin.menu.item.validators.description"/>
+    <label key="vbp.admin.menu.item.validators.label"/>
+    <link>/plugins/blueprint-validation/configure-validators.action</link>
+    <condition class="com.mesilat.vbp.xwork.ConfluenceAdministratorCondition"/>
+  </web-item>
+  <web-item key="vbp-configure-templates" section="system.admin/blueprint-validation" weight="20">
+    <description key="vbp.admin.menu.item.templates.description"/>
+    <label key="vbp.admin.menu.item.templates.label"/>
+    <link>/plugins/blueprint-validation/configure-templates.action</link>
+    <condition class="com.mesilat.vbp.xwork.ConfluenceAdministratorCondition"/>
+  </web-item>
+  <!--web-item key="space-tab-vbp-space" section="system.space.tools/contenttools" weight="20">
+    <label key="vbp.space.admin.tab.label" />
+    <link>/plugins/blueprint-validation/configure-space.action?key=$htmlUtil.urlEncode($helper.spaceKey)</link>
+    <condition class="com.atlassian.confluence.plugin.descriptor.web.conditions.SpaceSidebarCondition"/>
+    <condition class="com.atlassian.confluence.plugin.descriptor.web.conditions.SpacePermissionCondition">
+      <param name="permission">administer</param>
+    </condition>
+  </web-item-->
+
+  <xwork key="vbp-actions">
+    <package name="xwork-package" extends="default" namespace="/plugins/${project.artifactId}">
+      <default-interceptor-ref name="validatingStack"/>
+      <action name="configure-validators" class="com.mesilat.vbp.xwork.ConfigureValidatorsAction">
+        <result name="success" type="velocity">/templates/config/success.vm</result>
+        <result name="no-permission" type="velocity">/templates/config/permissions.vm</result>
+      </action>
+      <action name="configure-templates" class="com.mesilat.vbp.xwork.ConfigureTemplateAction">
+        <result name="success" type="velocity">/templates/admin/success.vm</result>
+        <result name="no-permission" type="velocity">/templates/admin/permissions.vm</result>
+      </action>
+        <!--action name="configure-space" class="com.mesilat.vbp.xwork.ConfigureSpaceAction">
+            <result name="success" type="velocity">/templates/space/success.vm</result>
+        </action-->
+
+      <!--action name="configure-space-templates" class="com.mesilat.vbp.xwork.ConfigureSpaceTemplatesAction">
+        <result name="success" type="velocity">/templates/space/success.vm</result>
+      </action-->
+
+      <action name="mixed" class="com.mesilat.vbp.xwork.SpaceConfigAction" method="doDefault">
+        <result name="input" type="velocity">/templates/space/input.vm</result>
+      </action>
+    </package>
+  </xwork>
+
+  <ao key="ao-module">
+    <entity>com.mesilat.vbp.ValidatorInfo</entity>
+    <entity>com.mesilat.vbp.TemplateInfo</entity>
+    <entity>com.mesilat.vbp.PageInfo</entity>
+  </ao>
+
+
+    <!--web-item key="space-tab-link-vbp-space-config" section="system.space" weight="20">
+        <label key="vbp.space.admin.tab.label"/>
+        <link>/plugins/${project.artifactId}/mixed.action?key=$generalUtil.urlEncode($helper.spaceKey)</link>
+        <condition class="com.atlassian.confluence.plugin.descriptor.web.conditions.SpaceSidebarCondition" invert="true"/>
+        <condition class="com.atlassian.confluence.plugin.descriptor.web.conditions.HasSpaceCondition"/>
+        <condition class="com.atlassian.confluence.plugin.descriptor.web.conditions.NotPersonalSpaceCondition" />
+        <condition class="com.atlassian.confluence.plugin.descriptor.web.conditions.SpacePermissionCondition">
+            <param name="permission">administer</param>
+        </condition>
+    </web-item-->
+
+    <web-item key="space-tools-link-vbp-space-config" section="system.space.tools/contenttools" weight="20">
+        <label key="vbp.space.admin.tab.label"/>
+        <link>/plugins/${project.artifactId}/mixed.action?key=$generalUtil.urlEncode($helper.spaceKey)</link>
+        <condition class="com.atlassian.confluence.plugin.descriptor.web.conditions.HasSpaceCondition"/>
+        <condition class="com.atlassian.confluence.plugin.descriptor.web.conditions.NotPersonalSpaceCondition" />
+        <condition class="com.atlassian.confluence.plugin.descriptor.web.conditions.SpacePermissionCondition">
+            <param name="permission">administer</param>
+        </condition>
+    </web-item>
+
+</atlassian-plugin>

@@ -1,0 +1,19 @@
+.vbp-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+}
+.vbp-col-4 {
+  grid-column: span 4;
+}
+.vbp-col-6 {
+  grid-column: span 6;
+}
+.vbp-col-6:first-child {
+  padding-right: 16px;
+}
+.vbp-col-6:last-child {
+  padding-left: 16px;
+}
+.vbp-col-6 input {
+  max-width: 100% !important;
+}

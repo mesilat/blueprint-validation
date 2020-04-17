@@ -1,0 +1,29 @@
+<ac:layout>
+  <ac:layout-section ac:type="two_equal">
+    <ac:layout-cell>
+      <table class="wrapped dsattr-projects dsattrtype-project">
+        <colgroup> <col/> <col/> <col/> <col/> </colgroup>
+        <tbody>
+          <tr>
+            <th>Cost</th>
+            <th>Manager</th>
+            <th>Start</th>
+            <th>Comment</th>
+          </tr>
+          <tr class="dsobject dsobjtype-project">
+            <td class="dsattr-cost dsattrtype-number"><ac:placeholder>A number</ac:placeholder></td>
+            <td class="dsattr-manager dsattrtype-user"><ac:placeholder>A user</ac:placeholder></td>
+            <td class="dsattr-start dsattrtype-date"><ac:placeholder>A date</ac:placeholder></td>
+            <td class="dsattr-comment"><ac:placeholder>A comment</ac:placeholder></td>
+          </tr>
+        </tbody>
+      </table>
+    </ac:layout-cell>
+    <ac:layout-cell>
+      <p>
+        <br/>
+      </p>
+    </ac:layout-cell>
+  </ac:layout-section>
+</ac:layout>
+

@@ -1,0 +1,53 @@
+{namespace Mesilat.Templates.Autocomplete}
+
+/**
+ * Autocomplete Reference Data Select Dialog
+ * @param data
+ * @param code
+ */
+{template .autocompleteDialog}
+    <section role="dialog" class="aui-layer aui-dialog2 aui-dialog2-medium autocomplete-select-dialog" aria-hidden="true">
+        <header class="aui-dialog2-header">
+            <h2 class="aui-dialog2-header-main">{getText('com.mesilat.autocomplete.title')}</h2>
+            <div class="aui-dialog2-header-secondary">
+                <form class="aui" action="#">
+                    <input class="text com-mesilat-autocomplete-filter" type="search" name="search" tabindex="1">
+                </form>
+            </div>
+        </header>
+        <div class="aui-dialog2-content">
+            <form class="aui top-label">
+                <div class="field-group top-label">
+                    {if length($data)}
+                        <select class="select" name="list-of-names" size="10" style="width:100%;max-width:none;">
+                            {foreach $rec in $data}
+                                {call .autocompleteOption}
+                                    {param option: $rec/}
+                                    {param code: $code/}
+                                {/call}
+                            {/foreach}
+                        </select>
+                    {else}
+                        <p>{getText('com.mesilat.autocomplete.empty')}</p>
+                    {/if}
+                </div>
+            </form>
+        </div>
+        <footer class="aui-dialog2-footer">
+            <div class="aui-dialog2-footer-actions">
+                <button class="aui-button save">{getText('com.mesilat.common.save')}</button>&nbsp;
+                <a class="cancel" href="#">{getText('com.mesilat.common.cancel')}</a>
+            </div>
+            <div class="aui-dialog2-footer-hint">{getTextAsHtml('com.mesilat.autocomplete.hint')}</div>
+        </footer>
+    </section>
+{/template}
+
+/**
+ * Autocomplete Reference Data Option
+ * @param option
+ * @param code
+ */
+{template .autocompleteOption}
+    <option value="{$option.code}" {if $option.code == $code}selected{/if}>{$option.name}</option>
+{/template}

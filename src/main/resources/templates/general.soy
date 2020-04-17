@@ -1,0 +1,25 @@
+{namespace Mesilat.BlueprintValidation}
+
+/**
+* Confirmation dialog
+* @param header
+* @param message
+* @param proceed
+* @param cancel
+*/
+{template .confirmationDialog}
+<section class="aui-dialog2 aui-dialog2-small aui-layer" role="dialog" aria-hidden="true" data-aui-modal="true" data-aui-remove-on-hide="true">
+  <header class="aui-dialog2-header">
+    <h2 class="aui-dialog2-header-main">{$header}</h2>
+  </header>
+  <div class="aui-dialog2-content">
+    {$message}
+  </div>
+  <footer class="aui-dialog2-footer">
+    <div class="aui-dialog2-footer-actions">
+      <button class="aui-button aui-button-primary">{$proceed}</button>
+      <button class="aui-button aui-button-cancel">{$cancel}</button>
+    </div>
+  </footer>
+</section>
+{/template}

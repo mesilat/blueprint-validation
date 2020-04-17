@@ -1,0 +1,86 @@
+{
+    "type": "object",
+    "properties": {
+    },
+    "required": [],
+    "additionalProperties": false,
+    "definitions": {
+        "vbp-boolean": {
+            "anyOf": [
+                { "type": "boolean" },
+                { "type": "array", "items": { "type": "boolean"} },
+                { "type": "null" }
+            ]
+        },
+        "vbp-date-obj": {
+            "type": "object",
+            "properties": {
+                "_type": { "enum": ["date"] },
+                "date": {
+                    "type": "string",
+                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                }
+            }
+        },
+        "vbp-date": {
+            "anyOf": [
+                { "$ref": "#/definitions/vbp-date-obj" },
+                { "type": "array", "items": { "$ref": "#/definitions/vbp-date-obj" } },
+                { "type": "null" }
+            ]
+        },
+        "vbp-link-obj": {
+            "type": "object",
+            "properties": {
+                "_type": { "enum": ["link"] },
+                "href": { "type": "string" }
+            }
+        },
+        "vbp-link": {
+            "anyOf": [
+                { "$ref": "#/definitions/vbp-link-obj" },
+                { "type": "array", "items": { "$ref": "#/definitions/vbp-link-obj" } },
+                { "type": "null" }
+            ]
+        },
+        "vbp-number": {
+            "anyOf": [
+                { "type": "number" },
+                { "type": "array", "items": { "type": "number"} },
+                { "type": "null" }
+            ]
+        },
+        "vbp-page-obj": {
+            "type": "object",
+            "properties": {
+                "_type": { "enum": ["page"] },
+                "title": { "type": "string" }
+            }
+        },
+        "vbp-page": {
+            "anyOf": [
+                { "$ref": "#/definitions/vbp-page-obj" },
+                { "type": "array", "items": { "$ref": "#/definitions/vbp-page-obj" } },
+                { "type": "null" }
+            ]
+        },
+        "vbp-user-obj": {
+            "type": "object",
+            "properties": {
+                "_type": { "enum": ["user"] },
+                "key": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]+$$"
+                },
+                "fullName": { "type": "string" }
+            }
+        },
+        "vbp-user": {
+            "anyOf": [
+                { "$ref": "#/definitions/vbp-user-obj" },
+                { "type": "array", "items": { "$ref": "#/definitions/vbp-user-obj" } },
+                { "type": "null" }
+            ]
+        }
+    }
+}
