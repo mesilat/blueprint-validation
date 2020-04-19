@@ -94,6 +94,11 @@ public class ValidatorManagerImpl implements ValidatorManager {
     }
 
     @Override
+    public boolean contains(String code) {
+        return ao.count(ValidatorInfo.class, "CODE = ?", code) > 0;
+    }
+
+    @Override
     public String css() {
         Map<String,String> prompts = new HashMap<>();
         Map<String,String> warnings = new HashMap<>();

@@ -2,8 +2,7 @@ package com.mesilat.vbp.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mesilat.vbp.Constants;
-import com.mesilat.vbp.drafts.DraftService;
-import com.mesilat.vbp.drafts.DraftService.Draft;
+import com.mesilat.vbp.impl.DraftService.Draft;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;

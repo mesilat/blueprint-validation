@@ -1,0 +1,70 @@
+<ac:layout>
+  <ac:layout-section ac:type="single">
+    <ac:layout-cell>
+      <table class="wrapped">
+        <colgroup>
+          <col/>
+          <col/>
+        </colgroup>
+        <tbody class="crm-contact">
+          <tr>
+            <td>Last name</td>
+            <td class="dsattr-lastname">
+              <ac:placeholder>Last name</ac:placeholder>
+            </td>
+          </tr>
+          <tr>
+            <td>First name, middle name</td>
+            <td class="dsattr-firstname">
+              <ac:placeholder>First name, middle name</ac:placeholder>
+            </td>
+          </tr>
+          <tr>
+            <td>Position</td>
+            <td class="dsattr-position">
+              <ac:placeholder>Position</ac:placeholder>
+            </td>
+          </tr>
+          <tr>
+            <td>Company</td>
+            <td class="dsattr-company dsattrtype-page validator-company prompt-company"/>
+          </tr>
+          <tr>
+            <td>Work phone</td>
+            <td class="dsattr-work-phone validator-phone prompt-phone"/>
+          </tr>
+          <tr>
+            <td>Work phone extension</td>
+            <td class="dsattr-work-phone-ext">
+              <ac:placeholder>Work phone extension (if any)</ac:placeholder>
+            </td>
+          </tr>
+          <tr>
+            <td>Personal phone</td>
+            <td class="dsattr-personal-phone validator-phone prompt-phone"/>
+          </tr>
+          <tr>
+            <td>Work email</td>
+            <td class="dsattr-work-email dsattrtype-text validator-email prompt-email"/>
+          </tr>
+          <tr>
+            <td>Personal email</td>
+            <td class="dsattr-personal-email dsattrtype-text validator-email prompt-email"/>
+          </tr>
+          <tr>
+            <td>Birth date</td>
+            <td class="dsattr-birth-date">
+              <ac:placeholder>Either full date or DD.MM</ac:placeholder>
+            </td>
+          </tr>
+          <tr>
+            <td>Notes</td>
+            <td class="dsattr-notes">
+              <ac:placeholder>Extra info (if any)</ac:placeholder>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </ac:layout-cell>
+  </ac:layout-section>
+</ac:layout>

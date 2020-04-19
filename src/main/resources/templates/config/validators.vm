@@ -1,0 +1,103 @@
+<form id="com-mesilat-vbp-validators" class="aui top-label">
+  <div class="aui-group" >
+    <div class="aui-item" style="width:300px;">
+      <div class="field-group top-label">
+        <label for="list-of-names">$action.getText("com.mesilat.vbp.config.validators.label")</label>
+        <select class="select" name="list-of-names" size="25" style="width:100%;">
+          #foreach( $validator in $validators )
+            <option value="$validator.code">$validator.name</option>
+          #end
+        </select>
+      </div>
+    </div>
+    <div class="aui-item" style="width:100%;">
+      <div class="vbp-grid">
+
+        <div class="vbp-col-4">
+          <div class="field-group top-label">
+            <label for="type">$action.getText("com.mesilat.vbp.config.type.label")</label>
+            <aui-select name="type" placeholder="$action.getText('com.mesilat.vbp.config.type.placeholder')">
+              #foreach( $validatorType in $validatorTypes )
+                <aui-option value="$validatorType.id">$validatorType.name</aui-option>
+              #end
+            </aui-select>
+            <div class="description">$action.getText("com.mesilat.vbp.config.type.desc")</div>
+          </div>
+        </div>
+
+        <div class="vbp-col-4">
+          <div class="field-group top-label">
+            <label for="code">$action.getText("com.mesilat.vbp.config.code.label")</label>
+            <input type="text" class="text" name="code"
+              placeholder="$action.getText('com.mesilat.vbp.config.code.placeholder')" />
+            <div class="description">$action.getText("com.mesilat.vbp.config.code.desc")</div>
+          </div>
+        </div>
+
+        <div class="vbp-col-4">
+          <div class="field-group top-label">
+            <label for="name">$action.getText("com.mesilat.vbp.config.name.label")</label>
+            <input type="text" class="text" name="name"
+              placeholder="$action.getText('com.mesilat.vbp.config.name.placeholder')" />
+            <div class="description">$action.getText("com.mesilat.vbp.config.name.desc")</div>
+          </div>
+        </div>
+
+        <div class="vbp-col-4">
+          <div class="field-group top-label">
+            <label for="prompt">$action.getText("com.mesilat.vbp.config.module.label")</label>
+            <input type="text" class="text" name="module"
+              placeholder="$action.getText('com.mesilat.vbp.config.module.placeholder')" />
+            <div class="description">$action.getText("com.mesilat.vbp.config.module.desc")</div>
+          </div>
+        </div>
+
+        <div class="vbp-col-4">
+          <div class="field-group top-label">
+            <label for="prompt">$action.getText("com.mesilat.vbp.config.prompt.label")</label>
+            <input type="text" class="text" name="prompt"
+              placeholder="$action.getText('com.mesilat.vbp.config.prompt.placeholder')" />
+            <div class="description">$action.getText("com.mesilat.vbp.config.prompt.desc")</div>
+          </div>
+        </div>
+
+        <div class="vbp-col-4">
+          <div class="field-group top-label">
+            <label for="warning">$action.getText("com.mesilat.vbp.config.warning.label")</label>
+            <input type="text" class="text" name="warning"
+              placeholder="$action.getText('com.mesilat.vbp.config.warning.placeholder')" />
+            <div class="description">$action.getText("com.mesilat.vbp.config.warning.desc")</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group top-label" style="height:100%">
+        <label for="text">$action.getText("com.mesilat.vbp.config.text.label")</label>
+        <textarea name="text" rows="10" class="textarea" style="width:100%; height:100%; max-width:none; max-height:none;"
+          placeholder="$action.getText('com.mesilat.vbp.config.text.placeholder')"></textarea>
+      </div>
+
+      <div class="buttons-container">
+        <div class="buttons">
+          <button id="com-mesilat-vbp-config-save" class="aui-button aui-button-primary">$action.getText("com.mesilat.general.save")</button>
+          <button id="com-mesilat-vbp-config-create" class="aui-button aui-button-link">$action.getText("com.mesilat.general.create")</button>
+          <button id="com-mesilat-vbp-config-delete" class="aui-button aui-button-link" disabled>$action.getText("com.mesilat.general.delete")</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="buttons-container">
+    <div class="buttons">
+      <a id="com-mesilat-vbp-templates-export" class="aui-button aui-button-link"
+        title="$action.getText('com.mesilat.vbp.config.validators.export')"
+        href="$req.contextPath/rest/blueprint-validation/1.0/validator?extensive=true">$action.getText("com.mesilat.general.export")</a>
+      <span class="aui-button aui-button-link com-mesilat-vbp-file-upload-wrapper">
+        <input type="file" id="com-mesilat-vbp-templates-import" name="vbp-templates-import"/>
+        <label for="com-mesilat-vbp-templates-import" title="$action.getText('com.mesilat.vbp.config.validators.import')">
+          $action.getText('com.mesilat.general.import')
+        </label>
+      </li>
+    </div>
+  </div>
+</form>

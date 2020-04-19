@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public final class Template {
+public class Template {
     public static enum ValidationMode { NONE, WARN, FAIL };
 
     @XmlElement

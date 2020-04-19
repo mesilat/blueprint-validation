@@ -1,9 +1,8 @@
 import $ from "jquery";
-
-export const PLUGIN_KEY = "com.mesilat.blueprint-validation";
+import { PLUGIN_KEY, TRACE_ENABLED } from "./constants";
 
 export function trace(){
-  const traceEnabled = !!window.localStorage["vbp-trace-enabled"];
+  const traceEnabled = !!window.localStorage[TRACE_ENABLED];
   if (traceEnabled){
     const args = [PLUGIN_KEY];
     for (let i = 0; i < arguments.length; i++) {
@@ -57,3 +56,39 @@ export function notifySuccess(title, message) {
     body: $("<p>").text(message).html()
   });
 }
+
+export async function waitForElement(selector) {
+  return new Promise(resolve => {
+    function check(count) {
+      if (count > 50) {
+        trace(`could not find: ${selector}`)
+        resolve(false);
+        return;
+      }
+      const $elt = $(selector);
+      if ($elt.length > 0) {
+        if ($elt.data("com-mesilat-vbp-initialized")) {
+          trace(`already initialized: ${selector}`)
+          resolve(false);
+        } else {
+          $elt.data("com-mesilat-vbp-initialized", true);
+          resolve($elt);
+        }
+      } else {
+        setTimeout(count => check(count), 50, count + 1);
+      }
+    }
+    check(0);
+  });
+}
+
+export async function flash($elt) {
+  return new Promise(resolve => {
+    $elt
+      .addClass('animated flash')
+      .one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', () => {
+        $elt.removeClass('animated flash');
+        resolve();
+      });
+  });
+};

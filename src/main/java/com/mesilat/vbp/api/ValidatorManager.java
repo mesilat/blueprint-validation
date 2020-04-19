@@ -9,5 +9,6 @@ public interface ValidatorManager {
     void create(Validator validator);
     void create(List<Validator> validators);
     void update(String code, Validator validator);
+    boolean contains(String code);
     String css();
 }

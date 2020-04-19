@@ -1,44 +1,19 @@
 import $ from "jquery";
-import initValidators from "./config/validators";
-import initTemplates from "./config/templates";
+import { trace, waitForElement } from "./util";
+import initTemplatesTable from "./config/templates";
+import initValidatorsForm from "./config/validators";
 
-function init(count) {
-  count = count||0;
-  if (count > 50) {
-    return; // give up
-  }
-  console.debug("validating-blueprints", "config.js::init()");
-  if (
-    $("#com-mesilat-configure-validators").length === 0 &&
-    $("#com-mesilat-configure-templates").length === 0
-  ){
-    setTimeout(init, 50, count + 1);
-    return;
-  }
+function init() {
+  trace("config::init()");
 
-  $("#com-mesilat-configure-validators").each(async function(){
-    const $div = $(this);
-    if ($div.data("initialized")) {
-      return;
-    }
-    $div
-      .data("initialized", true)
-      .empty();
+  waitForElement("#com-mesilat-vbp-templates")
+  .then($elt => $elt? initTemplatesTable($elt): null);
 
-    initValidators($div);
-  });
+  waitForElement("#com-mesilat-vbp-validators")
+  .then($elt => $elt? initValidatorsForm($elt): null);
 
-  $("#com-mesilat-configure-templates").each(async function(){
-    const $div = $(this);
-    if ($div.data("initialized")) {
-      return;
-    }
-    $div
-      .data("initialized", true)
-      .empty();
-
-    initTemplates($div);
-  });
+  waitForElement("#com-mesilat-vbp-config-tab2")
+  .then($elt => $elt && location.hash? $(`a[href="${location.hash}"]`).trigger("click"): null);
 }
 
 export default () => init();

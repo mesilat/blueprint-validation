@@ -2,15 +2,13 @@ import $ from "jquery";
 import _ from "lodash";
 import MutationObserver from "mutation-observer";
 import registry from "./registry";
-import { notifyError, notifySuccess } from "./util";
+import { notifyError, notifySuccess, trace } from "./util";
 import { post } from "./api";
-import { trace } from "./util";
 
 const registerDraft = async draft => post(`/rest/blueprint-validation/1.0/draft`, draft);
 
-
 function init(){
-  console.debug("validating-blueprints", "edit.js::init()");
+  trace("edit::init()");
 
   const ed = AJS.Rte.getEditor();
 
@@ -36,20 +34,17 @@ function init(){
     if (e.key === "Tab"){
       setTimeout(() => {
         checkTd();
-        //console.debug('edit::Tab', lastTdHolder.lastTd);
       });
     }
   });
   ed.dom.bind(ed.getDoc(), "focusout", (e) => {
     setTimeout(() => {
       checkTd();
-      //console.debug('edit::focusout', lastTdHolder.lastTd);
     });
   });
   $(ed.getDoc()).on("click", () => {
     setTimeout(() => {
       checkTd();
-      //console.debug('edit::click', lastTdHolder.lastTd);
     });
   });
 
@@ -103,35 +98,25 @@ export default () => {
       (
           options.type === "POST" && options.url.indexOf("/rest/api/content?") >= 0
         || options.type === "PUT" && options.url.indexOf("/rest/api/content/") >= 0
+        || options.type === "POST" && options.url.indexOf("/rest/api/content/blueprint/instance/") >= 0
       )
       && xhr.status === 500
       && xhr.responseJSON
       && xhr.responseJSON.data
       && xhr.responseJSON.data.reason === "JSON Validation"
     ){
-      console.debug(`vbp-ajax-error`, xhr.responseJSON.data.message);
-      // Expect popup message and modify text to desired
+      // Replace default error popup with validation result;
       // for details take a look at reliable-save.js method _makeRequest
       // in Confluence sources
-      /*
-      function hackMessage(count) {
-        if (count > 100) {
-          return;
-        }
-        const $msg = $('.aui-flag .server-offline');
-        if ($msg.length === 0) {
-          setTimeout(count => hackMessage(count), 20, count + 1);
-        } else {
-          $msg.text(xhr.responseJSON.data.message);
-        }
-      }
-      hackMessage(0);
-      */
       setTimeout(() => {
-        const $msg = $(".aui-flag .server-offline");
-        if ($msg.length > 0) {
-          $msg.text(xhr.responseJSON.data.message);
+        if ($(".aui-flag .server-offline").length > 0) {
+          const Message = window.require("confluence-editor/editor/page-editor-message");
+          Message.closeMessages(["server-offline"]);
         }
+        notifyError(
+          AJS.I18n.getText("com.mesilat.vbp.validation.error.title"),
+          xhr.responseJSON.data.message
+        );
       });
     }
   });
@@ -185,5 +170,4 @@ export default () => {
       }
     }
   });
-
 };

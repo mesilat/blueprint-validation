@@ -1,6 +1,7 @@
 import $ from "jquery";
-import { SHOW_PROMPT, SHOW_WARNING } from "./constants";
+import { SHOW_PROMPT, SHOW_WARNING, VALIDATE_PREFIX } from "./constants";
 import { get } from "./api";
+import { trace, error } from "./util";
 
 import ListOfValuesValidator from "./validators/list-of-values";
 import RegularExpressionValidator from "./validators/regular-expression";
@@ -11,18 +12,17 @@ import DateValidator from "./validators/date";
 
 const getValidators = async () => get(`/rest/blueprint-validation/1.0/validator?extensive=true`);
 
-
 function isEmpty($td){
-  if ($td.text().replace(/\s/g, '') !== ''){
+  if ($td.text().replace(/\s/g, "") !== ""){
     return false;
   }
-  const $descendants = $td.find('*');
+  const $descendants = $td.find("*");
   for (let i = 0; i < $descendants.length; i++){
     switch ($descendants[i].nodeName){
-      case 'P':
-      case 'SPAN':
-      case 'BR':
-      case 'DIV':
+      case "P":
+      case "SPAN":
+      case "BR":
+      case "DIV":
         break;
       default:
         return false;
@@ -34,13 +34,13 @@ function isEmpty($td){
 const registry = {
   classes: {},
   focusin: ($td, ed) => {
-    console.debug('registry::focusin');
+    trace("registry::focusin");
     const empty = isEmpty($td);
     $td[0].className.split(/\s+/).forEach((className) => {
-      if (className.indexOf("dsvalidate-") !== 0)
+      if (className.indexOf(VALIDATE_PREFIX) !== 0)
         return;
 
-      className = className.substr(11);
+      className = className.substr(VALIDATE_PREFIX.length);
       if (className in registry.classes){
         $td.removeClass(`${SHOW_PROMPT} ${SHOW_WARNING}`);
         if (registry.classes[className].focusin) {
@@ -50,14 +50,14 @@ const registry = {
     });
   },
   focusout: ($td, ed, lastTdHolder) => {
-    console.debug('registry::focusout');
+    trace("registry::focusout");
     const empty = isEmpty($td);
     let hasValidationClassName = false;
     $td[0].className.split(/\s+/).forEach((className) => {
-      if (className.indexOf("dsvalidate-") !== 0)
+      if (className.indexOf(VALIDATE_PREFIX) !== 0)
         return;
 
-      className = className.substr(11);
+      className = className.substr(VALIDATE_PREFIX.length);
       if (className in registry.classes){
         hasValidationClassName = true;
         if (registry.classes[className].focusout) {
@@ -75,7 +75,6 @@ const registry = {
 async function loadValidators() {
   try {
     const validators = await getValidators();
-    // console.debug("registry::loadValidators()", validators);
     validators.forEach(validator => {
       switch (validator.type) {
         case "LOFV":
@@ -99,12 +98,12 @@ async function loadValidators() {
         case "MODL":
           const Module = window.require(validator.module);
           if (!Module) {
-            console.error("validating-blueprints", `Module ${Module} could not be found`);
+            error(`Module ${Module} could not be found`);
           } else {
             try {
               registry.classes[validator.code] = new Module(validator);
             } catch(err) {
-              console.error("validating-blueprints", `Module ${Module} instantiation failed`, err);
+              error(`Module ${Module} instantiation failed`, err);
             }
           }
           break;
@@ -113,7 +112,7 @@ async function loadValidators() {
       }
     });
   } catch(err) {
-    console.error("Failed to get validators data", err);
+    error("Failed to get validators data", err);
   }
 }
 loadValidators();

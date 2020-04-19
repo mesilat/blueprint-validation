@@ -1,22 +1,22 @@
-#vbp-space-templates>tbody>tr:focus-within,
-#vbp-space-templates>tbody>tr:hover {
+#com-mesilat-vbp-templates>tbody>tr:focus-within,
+#com-mesilat-vbp-templates>tbody>tr:hover {
   background: rgba(9,30,66,.08);
   cursor: pointer;
 }
 
-.vbp-space-template-actions ul {
+.com-mesilat-vbp-template-actions ul {
   list-style: none;
 }
-.vbp-space-template-actions:focus-within,
-.vbp-space-template-actions:hover {
+.com-mesilat-vbp-template-actions:focus-within,
+.com-mesilat-vbp-template-actions:hover {
   background: unset !important;
   cursor: default;
 }
-.vbp-space-template-actions-shadow {
+.com-mesilat-vbp-template-actions-shadow {
   display: inline-block;
   filter: drop-shadow(0 0 1px black);
 }
-.vbp-space-template-actions-wrapper {
+.com-mesilat-vbp-template-actions-wrapper {
   padding: 18px 36px 8px 8px;
   margin: 1px 0 10px 0;
   min-width: 340px;
@@ -24,7 +24,7 @@
   clip-path: polygon(0 10px, 20px 10px, 30px 0, 40px 10px, 100% 10px, 100% 100%, 0 100%);
   -webkit-clip-path: polygon(0 10px, 20px 10px, 30px 0, 40px 10px, 100% 10px, 100% 100%, 0 100%);
 }
-.vbp-space-template-actions-wrapper:focus-within {
+.com-mesilat-vbp-template-actions-wrapper:focus-within {
   background: rgba(240,240,240);
 }
 

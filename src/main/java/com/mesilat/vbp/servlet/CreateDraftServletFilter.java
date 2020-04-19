@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mesilat.vbp.Constants;
-import com.mesilat.vbp.drafts.DraftService;
+import com.mesilat.vbp.impl.DraftService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -74,7 +74,7 @@ public class CreateDraftServletFilter implements Filter {
             if (draft.has("draftId")) {
                 Long draftId = draft.get("draftId").asLong();
                 LOGGER.debug(String.format("Draft %d template key: %s", draftId, templateKey));
-                DraftService.addDraftKey(draftId, spaceKey, blueprintKey);
+                DraftService.addDraftKey(draftId, spaceKey, templateKey);
             }
         } catch(Throwable ex) {
             LOGGER.warn("Failed to parse response", ex);

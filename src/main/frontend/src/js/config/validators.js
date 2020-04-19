@@ -1,52 +1,14 @@
 import $ from "jquery";
 import _ from "lodash";
-import { showConfirmationDialog, notify, notifyError, notifySuccess } from "../util";
+import { showConfirmationDialog, notify, notifyError, notifySuccess, trace, error } from "../util";
+import { get, post, put, del, downloadFile } from "../api";
 
-async function listValidators() {
-  return $.ajax({
-    url: `${AJS.contextPath()}/rest/blueprint-validation/1.0/validator`,
-    type: 'GET',
-    dataType: 'json',
-    timeout: 30000
-  });
-}
-async function getValidatorDetail(code) {
-  return $.ajax({
-    url: `${AJS.contextPath()}/rest/blueprint-validation/1.0/validator/${encodeURIComponent(code)}`,
-    type: 'GET',
-    dataType: 'json',
-    timeout: 30000
-  });
-}
-async function createValidator(data) {
-  return $.ajax({
-    url: `${AJS.contextPath()}/rest/blueprint-validation/1.0/validator`,
-    type: 'POST',
-    data: JSON.stringify(data),
-    dataType: 'json',
-    contentType: 'application/json',
-    processData: false,
-    timeout: 30000
-  });
-}
-async function updateValidator(code, data) {
-  return $.ajax({
-    url: `${AJS.contextPath()}/rest/blueprint-validation/1.0/validator/${encodeURIComponent(code)}`,
-    type: 'PUT',
-    data: JSON.stringify(data),
-    dataType: 'json',
-    contentType: 'application/json',
-    processData: false,
-    timeout: 30000
-  });
-}
-async function deleteValidator(code) {
-  return $.ajax({
-    url: `${AJS.contextPath()}/rest/blueprint-validation/1.0/validator/${encodeURIComponent(code)}`,
-    type: 'DELETE',
-    timeout: 30000
-  });
-}
+const listValidators = async () => get(`/rest/blueprint-validation/1.0/validator`);
+const getValidatorDetail = async code => get(`/rest/blueprint-validation/1.0/validator/${encodeURIComponent(code)}`);
+const createValidator = async data => post(`/rest/blueprint-validation/1.0/validator`, data);
+const updateValidator = async (code, data) => put(`/rest/blueprint-validation/1.0/validator/${encodeURIComponent(code)}`, data);
+const deleteValidator = async code => del(`/rest/blueprint-validation/1.0/validator/${encodeURIComponent(code)}`);
+const uploadValidators = async (data) => post(`/rest/blueprint-validation/1.0/validator/upload`, {}, { data });
 
 function validate($form) {
   const data = {};
@@ -76,15 +38,25 @@ function enableButton($form, id){
 }
 
 function onDataError(err) {
-  console.error(err);
-  notifyError("Error", err.responseText);
+  trace(err);
+  notifyError(AJS.I18n.getText("com.mesilat.general.error"), err.message);
+}
+function onCreate($form) {
+  $form.find("select[name='list-of-names']").val("");
+  updateForm($form, { type: "LOFV", code: "newval", name: "New validator" });
+  disableButton($form, "com-mesilat-vbp-config-delete");
+  onTypeChange($form);
+}
+function onTypeChange($form) {
+  const type = $form.find("aui-select[name='type']").val();
+  $form.find("input[name='module']").prop("disabled", type !== "MODL");
 }
 async function onSelected($form, code) {
-  console.debug("config::onSelected", code);
+  trace(`config::onSelected(${code})`);
   try {
     const data = await getValidatorDetail(code);
     updateForm($form, data);
-    enableButton($form, "vbp-config-delete");
+    enableButton($form, "com-mesilat-vbp-config-delete");
     onTypeChange($form);
   } catch (err) {
     onDataError(err);
@@ -92,7 +64,7 @@ async function onSelected($form, code) {
 }
 async function onSave($form) {
   let data = validate($form);
-  console.debug("config::onSave", data);
+  trace("validators::onSave", data);
 
   const $select = $form.find("select[name='list-of-names']");
   const code = $select.val();
@@ -111,16 +83,13 @@ async function onSave($form) {
         .appendTo($select);
     }
     $select.val(data.code).trigger("change");
-    notifySuccess("Success", "Validator was created successfully");
+    notifySuccess(
+      AJS.I18n.getText("com.mesilat.general.success"),
+      AJS.I18n.getText("com.mesilat.vbp.validator.create.success")
+    );
   } catch (err) {
     onDataError(err);
   }
-}
-function onCreate($form) {
-  $form.find("select[name='list-of-names']").val("");
-  updateForm($form, { type: "LOFV", code: "newval", name: "New validator" });
-  disableButton($form, "vbp-config-delete");
-  onTypeChange($form);
 }
 async function onDelete($form) {
   const $select = $form.find("select[name='list-of-names']");
@@ -129,45 +98,83 @@ async function onDelete($form) {
   const name = $option.text();
 
   if (await showConfirmationDialog({
-    header: "Delete validator",
-    message: `You are about to delete validator "${name}". This can not be undone`,
-    proceed: "Proceed",
-    cancel: "Cancel"
+    header: AJS.I18n.getText("com.mesilat.vbp.validator.delete.caption"),
+    message: AJS.I18n.getText("com.mesilat.vbp.validator.delete.prompt").replace("{}", name),
+    proceed: AJS.I18n.getText("com.mesilat.general.proceed"),
+    cancel: AJS.I18n.getText("com.mesilat.general.cancel")
   })) {
-    console.debug("config::onDelete", code);
+    trace("validators::onDelete", code);
     try {
       await deleteValidator(code);
       $option.remove();
-      notify("Deleted", `Validator "${name}" was deleted`);
+      notify(
+        AJS.I18n.getText("com.mesilat.general.deleted"),
+        AJS.I18n.getText("com.mesilat.vbp.validator.deleted.message").replace("{}", name)
+      );
       updateForm($form, { });
-      disableButton($form, "vbp-config-delete");
+      disableButton($form, "com-mesilat-vbp-config-delete");
     } catch (err) {
       onDataError(err);
     }
   }
 }
-function onTypeChange($form) {
-  const type = $form.find("aui-select[name='type']").val();
-  $form.find("input[name='module']").prop("disabled", type !== "MODL");
+async function onExport(href) {
+  try {
+    await downloadFile(href, "validators.json");
+  } catch(err) {
+    notifyError(AJS.I18n.getText("com.mesilat.general.error"), err.message);
+  }
+}
+async function onImport($form, e) {
+  try {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      if (e.target.readyState != 2)
+          return;
+      if (e.target.error) {
+        throw e.target.error;
+      }
+      try {
+        await uploadValidators(e.target.result);
+        const list = await listValidators();
+        const $select = $form.find(`select[name="list-of-names"]`);
+        const newValidators = list.filter(validator => $select.find(`option[value="${validator.code}"]`).length === 0);
+        trace("New validators: ", newValidators);
+        if (newValidators.length === 0) {
+          notifySuccess(
+            AJS.I18n.getText("com.mesilat.general.success"),
+            AJS.I18n.getText("com.mesilat.vbp.validators.import.nochange")
+          );
+        } else {
+          notifySuccess(
+            AJS.I18n.getText("com.mesilat.general.success"),
+            AJS.I18n.getText("com.mesilat.vbp.validators.import.success").replace("{}", newValidators.length)
+          );
+        }
+        newValidators.forEach(validator => {
+          $("<option>").attr("value", validator.code).text(validator.name).appendTo($select);
+        });
+      } catch(err) {
+        notifyError(AJS.I18n.getText("com.mesilat.general.error"), err.message);
+      }
+    };
+    reader.readAsText(e.target.files[0]);
+  } catch(err) {
+    notifyError(AJS.I18n.getText("com.mesilat.general.error"), err.message);
+  } finally {
+    $(e.target).val("");
+  }
 }
 
-export default async ($div) => {
-  const VT = window.require('com.mesilat.vbp.validator-types');
-  const VALIDATOR_TYPES = _.values(VT.getValidatorTypes())
-    .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
-
+export default async ($form) => {
   try {
-    const validators = await listValidators();
-    const $form = $(Mesilat.BlueprintValidation.validators({
-      validatorTypes: VALIDATOR_TYPES,
-      validators
-    }));
-    $form.appendTo($div);
     $form.find("select[name='list-of-names']").on("change", (e) => onSelected($form, $(e.target).val()));
-    $form.find("#vbp-config-save").on("click", (e) => { e.preventDefault(); onSave($form); });
-    $form.find("#vbp-config-create").on("click", (e) => { e.preventDefault(); onCreate($form); });
-    $form.find("#vbp-config-delete").on("click", (e) => { e.preventDefault(); onDelete($form); });
+    $form.find("#com-mesilat-vbp-config-save").on("click", (e) => { e.preventDefault(); onSave($form); });
+    $form.find("#com-mesilat-vbp-config-create").on("click", (e) => { e.preventDefault(); onCreate($form); });
+    $form.find("#com-mesilat-vbp-config-delete").on("click", (e) => { e.preventDefault(); onDelete($form); });
     $form.find("aui-select[name='type']").on("change", () => onTypeChange($form));
+    $form.find("#com-mesilat-vbp-templates-export").on("click", (e) => { e.preventDefault(); onExport($(e.target).attr("href")); });
+    $form.find("#com-mesilat-vbp-templates-import").on("change", (e) => onImport($form, e));
   } catch (err) {
     onDataError(err);
   }

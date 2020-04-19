@@ -3,6 +3,7 @@ package com.mesilat.vbp.servlet;
 import com.atlassian.confluence.content.render.xhtml.XhtmlException;
 import com.atlassian.confluence.pages.Page;
 import com.atlassian.confluence.pages.PageManager;
+import com.atlassian.event.api.EventPublisher;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import static com.mesilat.vbp.Constants.PLUGIN_KEY;
 import static com.mesilat.vbp.Constants.X_BLUEPRINT_VALIDATION;
 import com.mesilat.vbp.api.DataService;
+import com.mesilat.vbp.api.DataValidateEvent;
 import com.mesilat.vbp.api.ParseException;
 import com.mesilat.vbp.api.ParserService;
 import com.mesilat.vbp.api.TextConverterService;
@@ -40,6 +42,7 @@ public class PageServletBase {
     protected final TransactionTemplate transactionTemplate;
     protected final ObjectMapper mapper = new ObjectMapper();
     protected final I18nResolver resolver;
+    protected final EventPublisher eventPublisher;
 
     protected void preCreateValidate(
         ObjectNode obj, String spaceKey, String templateKey,
@@ -49,6 +52,7 @@ public class PageServletBase {
 
         ObjectNode data = parserService.parse(storageFormat, spaceKey);
         validationService.validate(templateKey, data);
+        eventPublisher.publish(new DataValidateEvent(null, data));
         resp.setHeader(X_BLUEPRINT_VALIDATION, "valid");
 
         Long pageId = doProcess(req, resp, chain);
@@ -84,6 +88,7 @@ public class PageServletBase {
 
         ObjectNode data = parserService.parse(storageFormat, spaceKey);
         validationService.validate(templateKey, data);
+        eventPublisher.publish(new DataValidateEvent(page, data));
 
         chain.doFilter(req, resp);
 
@@ -117,6 +122,7 @@ public class PageServletBase {
         transactionTemplate.execute(() -> {
             try {
                 validationService.runValidationTask(uuid, templateKey, data);
+                eventPublisher.publish(new DataValidateEvent(page, data));
                 dataService.createPageInfo(page, templateKey, true, null, _json);
             } catch (Throwable ex) {
                 dataService.createPageInfo(page, templateKey, false, ex.getMessage(), _json);
@@ -158,7 +164,7 @@ public class PageServletBase {
         data.put("valid", false);
         data.put("allowedInReadOnlyMode", false);
         data.set("errors", mapper.createArrayNode());
-        data.put("message", MessageFormat.format(resolver.getText("vbp.template.message.validation.error"), message));
+        data.put("message", MessageFormat.format(resolver.getText("com.mesilat.vbp.validation.error.message"), message));
         data.put("reason", "JSON Validation");
         obj.set("data", data);
         return obj;
@@ -171,7 +177,8 @@ public class PageServletBase {
         PageManager pageManager,
         DataService dataService,
         TransactionTemplate transactionTemplate,
-        I18nResolver resolver
+        I18nResolver resolver,
+        EventPublisher eventPublisher
     ) {
         this.textConverterService = textConverterService;
         this.parserService = parserService;
@@ -180,5 +187,6 @@ public class PageServletBase {
         this.dataService = dataService;
         this.transactionTemplate = transactionTemplate;
         this.resolver = resolver;
+        this.eventPublisher = eventPublisher;
     }
 }

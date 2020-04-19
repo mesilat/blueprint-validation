@@ -1,4 +1,5 @@
 import { SHOW_WARNING, VALUE_MULTI } from "../constants";
+import { error } from "../util";
 
 function RegularExpressionValidator(options) {
   this.title = options.name;
@@ -7,7 +8,7 @@ function RegularExpressionValidator(options) {
     try {
       this.regexps.push(new RegExp(re));
     } catch(err) {
-      console.error("RegularExpressionValidator::constructor", err.message);
+      error("RegularExpressionValidator::constructor", err.message);
     }
   });
 }

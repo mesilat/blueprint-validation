@@ -2,7 +2,9 @@ package com.mesilat.vbp.servlet;
 
 import com.atlassian.confluence.pages.Page;
 import com.atlassian.confluence.pages.PageManager;
+import com.atlassian.event.api.EventPublisher;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -17,7 +19,7 @@ import com.mesilat.vbp.api.TemplateManager;
 import com.mesilat.vbp.api.TextConverterService;
 import com.mesilat.vbp.api.ValidationException;
 import com.mesilat.vbp.api.ValidationService;
-import com.mesilat.vbp.drafts.DraftService;
+import com.mesilat.vbp.impl.DraftService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -161,10 +163,14 @@ public class CreateFromTemplateServletFilter extends PageServletBase implements 
         ValidationService validationService,
         ParserService parserService,
         DataService dataService,
-        I18nResolver resolver
+        I18nResolver resolver,
+        EventPublisher eventPublisher
     ) {
-        super(textConverterService, parserService, validationService,
-            pageManager, dataService, transactionTemplate, resolver);
+        super(
+            textConverterService, parserService, validationService,
+            pageManager, dataService, transactionTemplate, resolver,
+            eventPublisher
+        );
         this.templateManager = templateManager;
     }
 }

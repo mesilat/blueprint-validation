@@ -24,7 +24,7 @@ public class DataResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response get(@PathParam("id") Long pageId) throws JsonProcessingException {
-        LOGGER.debug(String.format("Get date for page %d", pageId));
+        LOGGER.debug(String.format("Get data for page %d", pageId));
 
         ObjectNode info = dataService.getPageInfo(pageId);
         if (info == null) {

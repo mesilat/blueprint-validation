@@ -144,7 +144,7 @@ public class ValidationServiceImpl implements ValidationService, InitializingBea
             task.setStatus("valid");
         } catch (Throwable ex) {
             task.setStatus("invalid");
-            String message = MessageFormat.format(resolver.getText("vbp.template.message.validation.error"), ex.getMessage());
+            String message = MessageFormat.format(resolver.getText("com.mesilat.vbp.validation.error.message"), ex.getMessage());
             task.setMessage(message);
             throw ex;
         }

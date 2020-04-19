@@ -3,6 +3,7 @@ import _ from "lodash";
 import { get } from "./api";
 import { trace, error, notifyError } from "./util";
 import NumberValidator from "./validators/number";
+import { VALIDATE_PREFIX } from "./constants";
 
 const getValidators = async () => get(`/rest/blueprint-validation/1.0/validator?extensive=true`);
 const getValidationTask = async uuid => get(`/rest/blueprint-validation/1.0/validation/${uuid}`);
@@ -22,7 +23,7 @@ async function loadValidators() {
     });
     return validatorsClasses;
   } catch(err) {
-    console.error("Failed to get validators data", err);
+    error("Failed to get validators data", err);
   }
 }
 
@@ -88,19 +89,19 @@ function updatePendingTasks(pendingTasks) {
 }
 
 async function init() {
-  console.debug("validating-blueprints", "view.js::init()");
+  trace("view::init()");
   try {
     const validatorsClasses = await loadValidators();
 
     _.keys(validatorsClasses).forEach(code => {
-      $(`td.dsvalidate-${code}`).each(function(){
+      $(`td.${VALIDATE_PREFIX}${code}`).each(function(){
         if (validatorsClasses[code].format) {
           validatorsClasses[code].formatValue($(this));
         }
       });
     });
   } catch (err) {
-    console.error("Failed to get validators data", err);
+    error("Failed to get validators data", err);
   }
 
   checkForPendingTasks();

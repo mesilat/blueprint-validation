@@ -1,0 +1,19 @@
+<!--
+No permission to view configuration page
+-->
+<html>
+  <head>
+    <title>$action.getText("com.mesilat.vbp.global.link")</title>
+    <meta name="decorator" content="atl.admin">
+  </head>
+  <body>
+    <content tag="selectedWebItem">admin.blueprint-validation</content>
+
+    <div class="aui-message aui-message-error">
+      <p class="title">
+        <strong>$generalUtil.getText("com.mesilat.general.error.title")</strong>
+      </p>
+      <p>$generalUtil.getText("com.mesilat.general.error.permission")</p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,60 @@
+{namespace Mesilat.BlueprintValidation}
+
+/**
+* Space template actions
+* @param templateKey
+* @param uploadEnabled
+*/
+{template .spaceTemplateActions}
+<tr class="com-mesilat-vbp-template-actions">
+  <td colspan="2">
+    <div class="com-mesilat-vbp-template-actions-shadow">
+      <div class="com-mesilat-vbp-template-actions-wrapper">
+        <p>
+          <form class="aui left-label">
+            <div class="aui-item">
+              <div class="field-group">
+                <label for="mode">{getText('com.mesilat.vbp.template.mode.label')}</label>
+                <aui-select name="mode">
+                  <aui-option value="NONE">{getText('com.mesilat.vbp.template.mode.NONE')}</aui-option>
+                  <aui-option value="WARN">{getText('com.mesilat.vbp.template.mode.WARN')}</aui-option>
+                  <aui-option value="FAIL">{getText('com.mesilat.vbp.template.mode.FAIL')}</aui-option>
+                </aui-select>
+              </div>
+            </div>
+          </form>
+        </p>
+        <p>
+          <ul>
+            <li>
+              <a class="com-mesilat-vbp-download-as-xml" href="{contextPath()}/rest/blueprint-validation/1.0/template/{$templateKey}/content">
+                {getText('com.mesilat.vbp.template.download.content')}
+              </a>
+            </li>
+            <li class="com-mesilat-vbp-file-upload-wrapper">
+              <input type="file" id="com-mesilat-vbp-template-upload-content" name="com-mesilat-vbp-template-upload-content"
+                {if not $uploadEnabled} disabled {/if}
+              />
+              <label for="com-mesilat-vbp-template-upload-content">{getText('com.mesilat.vbp.template.upload.content')}</label>
+            </li>
+            <li>
+              <a class="com-mesilat-vbp-download-as-json" href="{contextPath()}/rest/blueprint-validation/1.0/template/{$templateKey}/schema">
+                {getText('com.mesilat.vbp.template.download.schema')}
+              </a>
+            </li>
+            <li class="com-mesilat-vbp-file-upload-wrapper">
+              <input type="file" id="com-mesilat-vbp-template-upload-schema" name="com-mesilat-vbp-template-upload-schema"/>
+              <label for="com-mesilat-vbp-template-upload-schema">{getText('com.mesilat.vbp.template.upload.schema')}</label>
+            </li>
+            <li>
+              <a class="com-mesilat-vbp-download-as-json" href="{contextPath()}/rest/blueprint-validation/1.0/template/{$templateKey}/generate-schema">
+                {getText('com.mesilat.vbp.template.generate.schema')}
+              </a>
+            </li>
+          </ul>
+        </p>
+      </div>
+    </div>
+  </td>
+</tr>
+{/template}

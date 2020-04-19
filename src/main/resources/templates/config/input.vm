@@ -1,0 +1,34 @@
+<!--
+Global configuration page
+-->
+<html>
+  <head>
+    <title>$action.getText("com.mesilat.vbp.global.link")</title>
+    <meta name="decorator" content="atl.admin">
+    $webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
+    $webResourceManager.requireResourcesForContext("vbp-configure")
+  </head>
+<body>
+  <content tag="selectedWebItem">admin.blueprint-validation</content>
+
+  <div class="aui-tabs horizontal-tabs">
+    <ul class="tabs-menu">
+      <li class="menu-item active-tab">
+        <a href="#com-mesilat-vbp-config-tab1">$action.getText("com.mesilat.vbp.config.tab1.link")</a>
+      </li>
+      <li class="menu-item">
+        <a href="#com-mesilat-vbp-config-tab2">$action.getText("com.mesilat.vbp.config.tab2.link")</a>
+      </li>
+    </ul>
+    <div class="tabs-pane active-pane" id="com-mesilat-vbp-config-tab1">
+      <h2>$action.getText("com.mesilat.vbp.global.templates.caption")</h2>
+      #parse ("/templates/config/templates.vm")
+    </div>
+
+    <div class="tabs-pane" id="com-mesilat-vbp-config-tab2">
+      <h2>$action.getText("com.mesilat.vbp.global.validators.caption")</h2>
+      #parse ("/templates/config/validators.vm")
+    </div>
+  </div>
+</body>
+</html>

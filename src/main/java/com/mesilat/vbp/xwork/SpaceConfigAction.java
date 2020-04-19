@@ -23,20 +23,28 @@ public class SpaceConfigAction extends SpaceAdminAction {
     public String doDefault() {
         return INPUT;
     }
+
     public List getPageTemplates() {
+        String baseUrl = getGlobalSettings().getBaseUrl();
         Space space = spaceManager.getSpace(this.getKey());
         if (space == null) {
             return Collections.EMPTY_LIST;
         }
         List pageTemplates = pageTemplateManager.getPageTemplates(space);
-        List<Template> templates = new ArrayList<>();
+        List<TemplateWrapper> templates = new ArrayList<>();
         pageTemplates.forEach(pt -> {
             PageTemplate pageTemplate = (PageTemplate)pt;
-            Template template = manager.get(Long.toString(pageTemplate.getId()));
-            if (template == null) {
-                template = new Template(Long.toString(pageTemplate.getId()), pageTemplate.getName(), Template.ValidationMode.NONE);
+            if (pageTemplate.getModuleKey() != null) {
+                return; // global templates are configured elsewhere
             }
-            templates.add(template);
+            Template template = manager.get(Long.toString(pageTemplate.getId()));
+            TemplateWrapper templateWrapper = (template == null)?
+                new TemplateWrapper(Long.toString(pageTemplate.getId()), pageTemplate.getName(), Template.ValidationMode.NONE):
+                new TemplateWrapper(template);
+            String url = String.format("%s/pages/templates2/viewpagetemplate.action?entityId=%d&key=%s", baseUrl, pageTemplate.getId(), space.getKey());
+            templateWrapper.setUrl(url);
+            templateWrapper.setUploadEnabled(true);
+            templates.add(templateWrapper);
         });
                 
         return templates;

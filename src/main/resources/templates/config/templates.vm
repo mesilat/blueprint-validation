@@ -1,0 +1,33 @@
+<table id="com-mesilat-vbp-templates" class="confluenceTable">
+<thead>
+  <tr>
+    <th class="confluenceTh">$action.getText("com.mesilat.vbp.template.label")</th>
+    <th class="confluenceTh">$action.getText("com.mesilat.vbp.template.mode.label")</th>
+  </tr>
+  <tbody>
+    #foreach( $pageTemplate in $pageTemplates )
+      <tr
+        data-template-key="$pageTemplate.templateKey"
+        data-validation-mode="$pageTemplate.validationMode"
+        data-upload-enabled="$pageTemplate.uploadEnabled"
+      >
+        <td class="confluenceTd">
+          <a target="_blank" href="$pageTemplate.url">$pageTemplate.templateName</a>
+        </td>
+        #if ($pageTemplate.validationMode == "NONE")
+          <td class="confluenceTd">
+            <a href="javascript:;" class="com-mesilat-vbp-validation-mode">$action.getText("com.mesilat.vbp.template.mode.NONE")</a>
+          </td>
+        #elseif ($pageTemplate.validationMode == "WARN")
+          <td class="confluenceTd">
+            <a href="javascript:;" class="com-mesilat-vbp-validation-mode">$action.getText("com.mesilat.vbp.template.mode.WARN")</a>
+          </td>
+        #elseif ($pageTemplate.validationMode == "FAIL")
+          <td class="confluenceTd">
+            <a href="javascript:;" class="com-mesilat-vbp-validation-mode">$action.getText("com.mesilat.vbp.template.mode.FAIL")</a>
+          </td>
+        #end
+      </tr>
+    #end
+  </tbody>
+</table>

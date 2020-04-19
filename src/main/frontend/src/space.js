@@ -1,7 +1,6 @@
 import 'wr-dependency!com.atlassian.auiplugin:aui-select';
 import 'wr-dependency!com.atlassian.auiplugin:aui-flag';
 import 'wr-dependency!com.mesilat.blueprint-validation:validation-modes';
-import 'wr-dependency!com.mesilat.blueprint-validation:locale-strings';
 
 import space from './js/space';
 space();
