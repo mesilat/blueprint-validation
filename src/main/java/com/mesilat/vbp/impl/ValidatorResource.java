@@ -124,6 +124,7 @@ public class ValidatorResource extends ResourceBase {
     
     @DELETE
     @Path("/{code}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response delete(@PathParam("code") String code){
         if (!isConfluenceAdmin()) {
             return Response

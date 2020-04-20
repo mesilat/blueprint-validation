@@ -5,7 +5,14 @@ import FileSaver from "file-saver";
 const DEFAULT_TIMEOUT = 30000;
 
 function toError(xhr) {
-  if (xhr.responseJSON && xhr.responseJSON.message) {
+  // http://localhost:8090/wiki/authenticate.action?destination=%2Fplugins%2Fservlet%2Fupm
+  if (xhr.status === 401) {
+    const destination = window.location.href.substr(window.location.href.indexOf(AJS.contextPath()) + AJS.contextPath().length);
+    setTimeout(() => {
+      window.location = `${AJS.contextPath()}/authenticate.action?destination=${encodeURIComponent(destination)}`;
+    });
+    return new Error(AJS.I18n.getText("com.mesilat.general.error.permission"));
+  } else if (xhr.responseJSON && xhr.responseJSON.message) {
     return new Error(xhr.responseJSON.message);
   } else if (xhr.responseText) {
     return new Error(xhr.responseText.substr(0, 1000));
