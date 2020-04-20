@@ -16,7 +16,7 @@
 
       <body>
         <h2>$action.getText("com.mesilat.vbp.space.admin.caption")</h2>
-        #parse ("/templates/config/templates.vm")
+        #parse ("/templates/vbp/templates.vm")
       </body>
     #end
   #end

@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.mesilat</groupId>
   <artifactId>blueprint-validation</artifactId>
-  <version>0.1.0.61</version>
+  <version>0.1.0.65</version>
 
   <organization>
     <name>Mesilat Limited</name>
@@ -155,7 +155,7 @@
               sun.misc;resolution:="optional",
               com.mesilat.countries;resolution:="optional",
               com.mesilat.currencies;resolution:="optional",
-              com.atlassian.confluence.plugin.descriptor.web.conditions;resolution:="optional",              
+              com.atlassian.confluence.plugin.descriptor.web.conditions;resolution:="optional",
               *
             </Import-Package>
             <CONF_COMM/>

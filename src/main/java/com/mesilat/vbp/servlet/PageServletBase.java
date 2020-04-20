@@ -9,7 +9,7 @@ import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import static com.mesilat.vbp.Constants.PLUGIN_KEY;
+import com.mesilat.vbp.Constants;
 import static com.mesilat.vbp.Constants.X_BLUEPRINT_VALIDATION;
 import com.mesilat.vbp.api.DataService;
 import com.mesilat.vbp.api.DataValidateEvent;
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public class PageServletBase {
     public static final String PROPERTY_TEMPLATE = "com.mesilat.vbp.template";
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(PLUGIN_KEY);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(Constants.PLUGIN_KEY);
 
     protected final TextConverterService textConverterService;
     protected final ParserService parserService;

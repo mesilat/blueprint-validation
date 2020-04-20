@@ -18,10 +18,9 @@
       <transformer key="jsI18n"/>
     </transformation>
     <resource type="download" name="general.soy.js"          location="/templates/general.soy"/>
-    <resource type="download" name="validators.soy.js"       location="/templates/config/validators.soy"/>
     <resource type="download" name="validators.css"          location="/css/validators.css"/>
     <resource type="download" name="config-templates.css"    location="/css/templates.css"/>
-    <resource type="download" name="config-templates.soy.js" location="/templates/config/templates.soy"/>
+    <resource type="download" name="config-templates.soy.js" location="/templates/vbp/templates.soy"/>
     <context>vbp-configure</context>
   </web-resource>
 
@@ -90,11 +89,12 @@
     <package name="xwork-package" extends="default" namespace="/plugins/${project.artifactId}">
       <default-interceptor-ref name="validatingStack"/>
       <action name="space-config" class="com.mesilat.vbp.xwork.SpaceConfigAction" method="doDefault">
-        <result name="input" type="velocity">/templates/space/input.vm</result>
+        <result name="input" type="velocity">/templates/vbp/space.vm</result>
       </action>
       <action name="global-config" class="com.mesilat.vbp.xwork.GlobalConfigAction" method="doDefault">
-        <result name="input" type="velocity">/templates/config/input.vm</result>
-        <result name="error" type="velocity">/templates/config/error.vm</result>
+        <result name="input" type="velocity">/templates/vbp/config.vm</result>
+        <!--result name="error" type="velocity">/templates/config/error.vm</result-->
+        <result name="error" type="velocity">/notpermitted.vm</result>
       </action>
     </package>
   </xwork>

@@ -7,7 +7,6 @@ import com.atlassian.confluence.plugins.createcontent.extensions.ContentTemplate
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.sal.api.message.I18nResolver;
 import com.mesilat.vbp.api.Template;
 import com.mesilat.vbp.api.TemplateManager;
 import com.mesilat.vbp.api.ValidatorManager;
@@ -24,14 +23,29 @@ public class GlobalConfigAction extends ConfluenceActionSupport {
     private final ContentBlueprintManager contentBlueprintManager;
     private final TemplateManager templateManager;
     private final ValidatorManager validatorManager;
-    @ComponentImport
-    private final I18nResolver resolver;
 
+    private String title;
+    private String message;
+    private String cssClass;
+
+    public String getTitle() {
+        return title;
+    }
+    public String getMessage() {
+        return message;
+    }
+    public String getCssClass() {
+        return cssClass;
+    }
+    
     @Override
     public String doDefault() {
         if (getPermissionManager().isSystemAdministrator(getAuthenticatedUser())) {
             return INPUT;
         } else {
+            title = getText("title.not.permitted");
+            message = getText("not.permitted.description");
+            cssClass = "not-permitted-background-image";
             return ERROR;
         }
     }
@@ -70,22 +84,20 @@ public class GlobalConfigAction extends ConfluenceActionSupport {
     public List getValidatorTypes() {
         List<ValidatorType> validatorTypes = new ArrayList<>();
         Arrays.asList(VALIDATOR_TYPES).forEach(key -> validatorTypes.add(
-            new ValidatorType(key, resolver.getText(String.format("com.mesilat.vbp.types.%s", key)))
+            new ValidatorType(key, getText(String.format("com.mesilat.vbp.types.%s", key)))
         ));
         return validatorTypes;
-    }
-        
+    }        
 
     @Inject
     public GlobalConfigAction(
         ContentBlueprintManager contentBlueprintManager,
         TemplateManager templateManager,
-        ValidatorManager validatorManager, I18nResolver resolver
+        ValidatorManager validatorManager
     ){
         this.contentBlueprintManager = contentBlueprintManager;
         this.templateManager = templateManager;
         this.validatorManager = validatorManager;
-        this.resolver = resolver;
     }
 
     public static class ValidatorType {

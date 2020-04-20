@@ -1,6 +1,7 @@
 package com.mesilat.vbp.impl;
 
-import static com.mesilat.vbp.Constants.PLUGIN_KEY;
+import com.atlassian.sal.api.websudo.WebSudoNotRequired;
+import com.mesilat.vbp.Constants;
 import com.mesilat.vbp.api.ValidationService;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -15,8 +16,9 @@ import com.mesilat.vbp.impl.ValidationServiceImpl.ValidationTask;
 
 
 @Path("/validation")
+@WebSudoNotRequired
 public class ValidationResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PLUGIN_KEY);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Constants.PLUGIN_KEY);
     private final ValidationService service;
 
     @GET

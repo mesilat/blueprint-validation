@@ -2,7 +2,7 @@ package com.mesilat.vbp.converter;
 
 import com.atlassian.annotations.security.XsrfProtectionExcluded;
 import com.atlassian.confluence.content.render.xhtml.XhtmlException;
-import static com.mesilat.vbp.Constants.PLUGIN_KEY;
+import com.mesilat.vbp.Constants;
 import com.mesilat.vbp.api.TextConverterService;
 import javax.inject.Inject;
 import javax.ws.rs.POST;
@@ -30,7 +30,7 @@ async function convertContentToStorageFormat(html) {
 */
 @Path("/converter")
 public class TextConverterResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PLUGIN_KEY);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Constants.PLUGIN_KEY);
 
     private final TextConverterService converter;
 

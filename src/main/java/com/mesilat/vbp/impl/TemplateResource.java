@@ -3,8 +3,9 @@ package com.mesilat.vbp.impl;
 import com.atlassian.confluence.content.render.xhtml.XmlEventReaderFactory;
 import com.atlassian.confluence.pages.templates.PageTemplate;
 import com.atlassian.confluence.pages.templates.PageTemplateManager;
-import com.atlassian.confluence.plugins.createcontent.ContentBlueprintManager;
 import com.atlassian.confluence.plugins.createcontent.extensions.ContentTemplateModuleDescriptor;
+import com.atlassian.confluence.security.PermissionManager;
+import com.atlassian.confluence.security.SpacePermissionManager;
 import com.atlassian.confluence.util.UserAgentUtil;
 import com.atlassian.confluence.xml.XhtmlEntityResolver;
 import com.atlassian.plugin.ModuleDescriptor;
@@ -14,13 +15,12 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import static com.google.common.net.HttpHeaders.CACHE_CONTROL;
 import static com.google.common.net.HttpHeaders.CONTENT_DISPOSITION;
 import static com.google.common.net.HttpHeaders.EXPIRES;
 import static com.google.common.net.HttpHeaders.PRAGMA;
-import static com.mesilat.vbp.Constants.PLUGIN_KEY;
+import com.mesilat.vbp.Constants;
 import com.mesilat.vbp.api.Template;
 import com.mesilat.vbp.api.TemplateManager;
 import java.io.IOException;
@@ -29,7 +29,6 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Base64;
-import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -67,39 +66,31 @@ import org.xml.sax.SAXParseException;
 
 @Path("/template")
 @Scanned
-public class TemplateResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PLUGIN_KEY);
+public class TemplateResource extends ResourceBase {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Constants.PLUGIN_KEY);
     private static final Logger EXTRA_TRACE = LoggerFactory.getLogger("extratrace");
-    private static final Pattern DECIMAL = Pattern.compile("^\\d+$");
 
     @ComponentImport
     private final PluginAccessor pluginAccessor;
     @ComponentImport
     private final XmlEventReaderFactory xmlEventReaderFactory;
     @ComponentImport
-    private final ContentBlueprintManager contentBlueprintManager;
-    @ComponentImport
-    private final I18nResolver resolver;
-    @ComponentImport
     private final PageTemplateManager pageTemplateManager;
-
     private final TemplateManager service;
-    private final ObjectMapper mapper = new ObjectMapper();
 
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response get(@QueryParam("schema") Boolean schema) {
-        LOGGER.debug("List template settings");
-        return Response.ok(service.list(schema == null? false: schema)).build();
+    public Response get(@QueryParam("schema") Boolean includeSchema) {
+        LOGGER.trace("List template settings");
+        return Response.ok(service.list(includeSchema == null? false: includeSchema)).build();
     }
     
     @GET
     @Path("/{key}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response get(@PathParam("key") String templateKey) {
-        LOGGER.debug(String.format("Get template settings for %s", templateKey));
-
+        LOGGER.trace(String.format("Get template settings for template %s", templateKey));
         Template template = service.get(templateKey);
         if (template == null) {
             return Response
@@ -115,9 +106,13 @@ public class TemplateResource {
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response post(Template template){
-        LOGGER.debug(String.format("Post template settings"));
+    public Response post(Template template) {
+        Response response = checkUserCanAdministerTemplate(template.getTemplateKey());
+        if (response != null) {
+            return response;
+        }
 
+        LOGGER.trace(String.format("Create template settings for template %s", template.getTemplateKey()));
         service.create(template);
         return get(template.getTemplateKey());
     }
@@ -127,8 +122,12 @@ public class TemplateResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response put(@PathParam("key") String templateKey, Template template){
-        LOGGER.debug(String.format("Update template settings"));
+        Response response = checkUserCanAdministerTemplate(templateKey);
+        if (response != null) {
+            return response;
+        }
 
+        LOGGER.trace(String.format("Update template settings for template %s", templateKey));
         if (templateKey == null) {
             return Response
                 .status(Response.Status.BAD_REQUEST)
@@ -143,6 +142,12 @@ public class TemplateResource {
     @DELETE
     @Path("/{key}")
     public Response delete(@PathParam("key") String templateKey){
+        Response response = checkUserCanAdministerTemplate(templateKey);
+        if (response != null) {
+            return response;
+        }
+
+        LOGGER.trace(String.format("Delete template settings for template %s", templateKey));
         service.delete(templateKey);
         return Response.status(Response.Status.ACCEPTED).build();
     }
@@ -151,8 +156,7 @@ public class TemplateResource {
     @Path("/{key}/content")
     @Produces(MediaType.TEXT_XML + ";charset=utf-8")
     public Response getContent(@PathParam("key") String templateKey) {
-        LOGGER.debug(String.format("Get content of template %s", templateKey));
-        
+        LOGGER.trace(String.format("Get content of template %s", templateKey));
         PageTemplate pageTemplate = getPageTemplateByModuleKey(templateKey);
         if (pageTemplate == null) {
             return Response
@@ -178,8 +182,12 @@ public class TemplateResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Consumes(MediaType.TEXT_XML)
     public Response putContent(@PathParam("key") String templateKey, String content) {
-        LOGGER.debug(String.format("Put content of template %s", templateKey));
-        
+        Response response = checkUserCanAdministerTemplate(templateKey);
+        if (response != null) {
+            return response;
+        }
+
+        LOGGER.trace(String.format("Put content of template %s", templateKey));        
         ValidationError error = this.validate(content);
         if (error != null) {
             return Response.status(Status.BAD_REQUEST).entity(error).build();
@@ -203,8 +211,7 @@ public class TemplateResource {
     @Path("/{key}/generate-schema")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response schema(@PathParam("key") String templateKey){
-        LOGGER.debug(String.format("Create JSON schema for template %s", templateKey));
-
+        LOGGER.trace(String.format("Generate JSON schema for template %s", templateKey));
         PageTemplate pageTemplate = getPageTemplateByModuleKey(templateKey);
         if (pageTemplate == null) {
             return Response
@@ -232,44 +239,17 @@ public class TemplateResource {
         }
     }
 
-    @GET
-    @Path("/list-blueprint-templates")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response list() throws JsonProcessingException {
-        LOGGER.debug("List available blueprint templates");
-
-        ArrayNode templates = mapper.createArrayNode();
-        contentBlueprintManager.getAll().forEach(blueprint -> {
-            ObjectNode bp = mapper.createObjectNode();
-            bp.put("uuid", blueprint.getId().toString());
-            bp.put("id", blueprint.getModuleCompleteKey());
-            bp.put("name", blueprint.getI18nNameKey() == null
-                ? blueprint.getModuleCompleteKey()
-                : resolver.getText(blueprint.getI18nNameKey())
-            );
-
-            blueprint.getContentTemplateRefs().forEach(contentTemplateRef -> {
-                ObjectNode template = mapper.createObjectNode();
-                template.put("uuid", contentTemplateRef.getId().toString());
-                template.put("id", contentTemplateRef.getModuleCompleteKey());
-                template.put("name", contentTemplateRef.getI18nNameKey() == null
-                    ? contentTemplateRef.getModuleCompleteKey()
-                    : resolver.getText(contentTemplateRef.getI18nNameKey())
-                );
-                template.set("blueprint", bp);
-                templates.add(template);
-            });
-        });
-        return Response.ok(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(templates)).build();
-    }
-
     @PUT
     @Path("/{key}/schema")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response putSchema(@PathParam("key") String templateKey, String schema) {
-        LOGGER.debug(String.format("Upload schema for template %s", templateKey));
+        Response response = checkUserCanAdministerTemplate(templateKey);
+        if (response != null) {
+            return response;
+        }
 
+        LOGGER.trace(String.format("Upload JSON schema for template %s", templateKey));
         Template template = service.get(templateKey);
         if (template == null) {
             PageTemplate pageTemplate = getPageTemplateByModuleKey(templateKey);
@@ -290,8 +270,7 @@ public class TemplateResource {
     @Path("/{key}/schema")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response getSchema(@PathParam("key") String templateKey) throws UnsupportedEncodingException{
-        LOGGER.debug(String.format("Get JSON schema for template %s", templateKey));
-
+        LOGGER.trace(String.format("Get JSON schema for template %s", templateKey));
         Template template = service.get(templateKey);
         if (template == null || template.getSchema() == null) {
             return schema(templateKey);
@@ -311,12 +290,9 @@ public class TemplateResource {
         }
     }
 
-    private PageTemplate getPageTemplateByModuleKey(String moduleCompleteKey) {
-        if (DECIMAL.matcher(moduleCompleteKey).matches()) {
-            Long templateId = Long.parseLong(moduleCompleteKey);
-            return pageTemplateManager.getPageTemplate(templateId);
-        } else {
-            ModuleDescriptor contentTemplateModuleDescriptor = pluginAccessor.getEnabledPluginModule(moduleCompleteKey);
+    private PageTemplate getPageTemplateByModuleKey(String templateKey) {
+        if (isGlobalTemplate(templateKey)) {
+            ModuleDescriptor contentTemplateModuleDescriptor = pluginAccessor.getEnabledPluginModule(templateKey);
             if (contentTemplateModuleDescriptor instanceof ContentTemplateModuleDescriptor) {
                 try {
                     PageTemplate e = ((ContentTemplateModuleDescriptor) contentTemplateModuleDescriptor).getModule();
@@ -327,6 +303,9 @@ public class TemplateResource {
                     throw new RuntimeException(ex);
                 }
             }
+        } else {
+            Long templateId = Long.parseLong(templateKey);
+            return pageTemplateManager.getPageTemplate(templateId);
         }
         return null;
     }
@@ -390,12 +369,13 @@ public class TemplateResource {
 
     @Inject
     public TemplateResource(PluginAccessor pluginAccessor, XmlEventReaderFactory xmlEventReaderFactory,
-            ContentBlueprintManager contentBlueprintManager, I18nResolver resolver, TemplateManager service,
-            PageTemplateManager pageTemplateManager){
+            I18nResolver resolver, TemplateManager service,
+            PageTemplateManager pageTemplateManager, @ComponentImport PermissionManager permissionManager,
+            @ComponentImport SpacePermissionManager spacePermissionManager
+    ) {
+        super(permissionManager, resolver, pageTemplateManager, spacePermissionManager);
         this.pluginAccessor = pluginAccessor;
         this.xmlEventReaderFactory = xmlEventReaderFactory;
-        this.contentBlueprintManager = contentBlueprintManager;
-        this.resolver = resolver;
         this.service = service;
         this.pageTemplateManager = pageTemplateManager;
     }

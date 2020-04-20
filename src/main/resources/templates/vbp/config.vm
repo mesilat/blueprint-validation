@@ -22,12 +22,12 @@ Global configuration page
     </ul>
     <div class="tabs-pane active-pane" id="com-mesilat-vbp-config-tab1">
       <h2>$action.getText("com.mesilat.vbp.global.templates.caption")</h2>
-      #parse ("/templates/config/templates.vm")
+      #parse ("/templates/vbp/templates.vm")
     </div>
 
     <div class="tabs-pane" id="com-mesilat-vbp-config-tab2">
       <h2>$action.getText("com.mesilat.vbp.global.validators.caption")</h2>
-      #parse ("/templates/config/validators.vm")
+      #parse ("/templates/vbp/validators.vm")
     </div>
   </div>
 </body>
