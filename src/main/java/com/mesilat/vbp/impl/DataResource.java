@@ -26,7 +26,7 @@ public class DataResource {
     public Response get(@PathParam("id") Long pageId) throws JsonProcessingException {
         LOGGER.debug(String.format("Get data for page %d", pageId));
 
-        ObjectNode info = dataService.getPageInfo(pageId);
+        ObjectNode info = ((DataServiceImpl)dataService).getPageInfo(pageId);
         if (info == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         } else {

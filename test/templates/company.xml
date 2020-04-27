@@ -1,0 +1,47 @@
+<table class="wrapped">
+  <colgroup> <col/> <col/> </colgroup>
+  <tbody>
+    <tr>
+      <th>Title</th>
+      <td class="dsattr-title">
+        <ac:placeholder>Title</ac:placeholder>
+      </td>
+    </tr>
+    <tr>
+      <th>Position</th>
+      <td class="dsattr-position" style="text-align: right;">
+        <ac:placeholder>Position</ac:placeholder>
+      </td>
+    </tr>
+    <tr>
+      <th>Value, USD Bln</th>
+      <td class="dsattr-value" style="text-align: right;">
+        <ac:placeholder>Value</ac:placeholder>
+      </td>
+    </tr>
+    <tr>
+      <th>Assets, USD Bln</th>
+      <td class="dsattr-assets" style="text-align: right;">
+        <ac:placeholder>Assets</ac:placeholder>
+      </td>
+    </tr>
+    <tr>
+      <th>Sales, USD Bln</th>
+      <td class="dsattr-sales" style="text-align: right;">
+        <ac:placeholder>Sales</ac:placeholder>
+      </td>
+    </tr>
+    <tr>
+      <th>Profits, USD Bln</th>
+      <td class="dsattr-profits" style="text-align: right;">
+        <ac:placeholder>Profits</ac:placeholder>
+      </td>
+    </tr>
+    <tr>
+      <th>Country</th>
+      <td class="dsattr-country">
+        <ac:placeholder>Country</ac:placeholder>
+      </td>
+    </tr>
+  </tbody>
+</table>

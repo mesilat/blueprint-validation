@@ -53,18 +53,23 @@
     <resource type="download" name="validation-modes.js" location="/js/validation-modes.js"/>
   </web-resource>
 
+  <!--servlet-filter key="vbp-create-draft-filter2" class="com.mesilat.vbp.servlet.CreateDraftServletFilter2" location="before-dispatch" weight="100">
+    <url-pattern>/pages/createpage-entervariables.action</url-pattern>
+  </servlet-filter>
   <servlet-filter key="vbp-create-draft-filter" class="com.mesilat.vbp.servlet.CreateDraftServletFilter" location="before-dispatch" weight="100">
     <url-pattern>/rest/create-dialog/1.0/content-blueprint/create-draft</url-pattern>
   </servlet-filter>
   <servlet-filter key="bvp-create-page-filter" class="com.mesilat.vbp.servlet.CreateFromBlueprintServletFilter" location="before-dispatch" weight="1">
     <url-pattern>/rest/api/content/blueprint/instance/*</url-pattern>
   </servlet-filter>
-
   <servlet-filter key="vbp-page-create" class="com.mesilat.vbp.servlet.CreateFromTemplateServletFilter" location="before-dispatch" weight="100">
     <url-pattern>/rest/api/content</url-pattern>
-  </servlet-filter>
-  <servlet-filter key="bvp-edit-content-filter" class="com.mesilat.vbp.servlet.EditContentServletFilter" location="before-dispatch" weight="1">
+  </servlet-filter-->
+
+  <servlet-filter key="bvp-edit-content-filter" class="com.mesilat.vbp.servlet.ValidatingServletFilter" location="before-dispatch" weight="100">
+    <url-pattern>/rest/api/content</url-pattern>
     <url-pattern>/rest/api/content/*</url-pattern>
+    <url-pattern>/rest/api/content/blueprint/instance/*</url-pattern>
   </servlet-filter>
 
   <rest key="rest" path="/blueprint-validation" version="1.0" />

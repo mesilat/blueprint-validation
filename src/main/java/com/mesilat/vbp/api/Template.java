@@ -12,8 +12,8 @@ public class Template {
 
     @XmlElement
     private String templateKey;
-    @XmlElement
-    private String templateName;
+    //@XmlElement
+    //private String templateName;
     @XmlElement
     private ValidationMode validationMode;
     @XmlElement
@@ -25,12 +25,14 @@ public class Template {
     public void setTemplateKey(String templateKey) {
         this.templateKey = templateKey;
     }
+    /*
     public String getTemplateName() {
         return templateName;
     }
     public void setTemplateName(String templateName) {
         this.templateName = templateName;
     }
+    */
     public ValidationMode getValidationMode() {
         return validationMode;
     }
@@ -46,14 +48,14 @@ public class Template {
 
     public Template() {
     }
-    public Template(String templateKey, String templateName, String validationMode) {
+    public Template(String templateKey, String validationMode) {
         this.templateKey = templateKey;
-        this.templateName = templateName;
+        //this.templateName = templateName;
         this.validationMode = ValidationMode.valueOf(validationMode);
     }
-    public Template(String templateKey, String templateName, ValidationMode validationMode) {
+    public Template(String templateKey, ValidationMode validationMode) {
         this.templateKey = templateKey;
-        this.templateName = templateName;
+        //this.templateName = templateName;
         this.validationMode = validationMode;
     }
 }

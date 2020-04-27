@@ -16,7 +16,8 @@ const getWrmPlugin = (watch = false, watchPrepare = false) => {
     contextMap: {
       'vbp-frontend-edit': [ 'editor' ],
       'vbp-frontend-view': [ 'page' ],
-      'vbp-frontend-config': [ 'vbp-configure' ]
+      'vbp-frontend-config': [ 'vbp-configure' ],
+      'vbp-frontend-general': [ 'atl.general' ]
     },
     providedDependencies: providedDependencies,
     watch: watch,
@@ -29,7 +30,8 @@ const webpackConfig = {
   entry: {
     'vbp-frontend-edit': path.join(SRC_DIR, 'edit.js'),
     'vbp-frontend-view': path.join(SRC_DIR, 'view.js'),
-    'vbp-frontend-config': path.join(SRC_DIR, 'config.js')
+    'vbp-frontend-config': path.join(SRC_DIR, 'config.js'),
+    'vbp-frontend-general': path.join(SRC_DIR, 'general.js')
   },
   module: {
     rules: [

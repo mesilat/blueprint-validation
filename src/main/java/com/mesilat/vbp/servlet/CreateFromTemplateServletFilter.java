@@ -4,7 +4,6 @@ import com.atlassian.confluence.pages.Page;
 import com.atlassian.confluence.pages.PageManager;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.fasterxml.jackson.databind.node.ObjectNode;

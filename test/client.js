@@ -1,47 +1,33 @@
-const https = require("https");
-const axios = require("axios");
-const settings = require("../.jest.settings");
+const ConfluenceClient = require('confluence-client');
 
-const agent = new https.Agent({ rejectUnauthorized: false });
-
-async function get(url, params) {
-  return axios.get(`${settings.baseaddr}${url}`, {
-    params,
-    auth: {
-      username: settings.username,
-      password: settings.password
-    },
-    httpsAgent: agent,
-    headers: {
-      "x-atlassian-token": "no-check"
-    }
-  });
+function Client(options) {
+    ConfluenceClient.apply(this, [options]);
 }
-async function post(url, data, params, options) {
-  options = options || {};
-  if (params) {
-    options.params = params;
-  }
-  options.auth = {
-    username: settings.username,
-    password: settings.password
-  };
-  options.httpsAgent = agent;
-  options.headers = options.headers || {};
-  options.headers["x-atlassian-token"] = "no-check";
-
-  //console.debug("POST", `${options.baseaddr}${url}`, data, options);
-  return axios.post(`${settings.baseaddr}${url}`, data, options);
+Client.prototype = Object.create(ConfluenceClient.prototype);
+Client.prototype.constructor = Client;
+Client.prototype.setTemplateValidationMode = async function(data /*{templateKey, templateName, validationMode}*/) {
+  return this.post(`/rest/blueprint-validation/1.0/template`, data);
 }
-async function parsePage(data, spaceKey) {
-  const params = { "space-key": spaceKey };
-  return post("/rest/blueprint-validation/1.0/parser/parse", data, params, {
-    headers: {
-      "content-type": "text/xml"
+Client.prototype.listSpaceTemplates = async function(spaceKey) {
+  return this.get(`/rest/experimental/template/page`, { spaceKey });
+}
+Client.prototype.getBlueprintInfo = async function(blueprintModuleCompleteKey) {
+  return this.get(`/rest/create-dialog/1.0/blueprints/get`, { blueprintModuleCompleteKey });
+}
+Client.prototype.createDraftFromBlueprint = async function(spaceKey, title, blueprint) {
+  return this.post(`/rest/create-dialog/1.0/content-blueprint/create-draft`, {
+    spaceKey,
+    contentBlueprintId: blueprint.id,
+    parentPageId: null,
+    title,
+    context:{
+      blueprintModuleCompleteKey: blueprint.moduleCompleteKey,
+      contentBlueprintId: blueprint.id,
+      new: true,
+      spaceKey
     }
   });
 }
 
-module.exports = {
-  get, post, parsePage
-};
+
+module.exports = Client;

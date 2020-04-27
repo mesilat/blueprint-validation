@@ -4,11 +4,30 @@ import MutationObserver from "mutation-observer";
 import registry from "./registry";
 import { notifyError, notifySuccess, trace } from "./util";
 import { post } from "./api";
+import { checkLocation } from "./navigation/nav";
+import { X_VBP_TEMPLATE } from "./constants";
 
 const registerDraft = async draft => post(`/rest/blueprint-validation/1.0/draft`, draft);
 
 function init(){
-  trace("edit::init()");
+
+  const query = new URLSearchParams(window.location.search);
+  if (query.has("draftId") && window.localStorage[X_VBP_TEMPLATE]) {
+    const docTemplate = JSON.parse(window.localStorage[X_VBP_TEMPLATE]);
+    if (`${docTemplate.draftId}` === query.get("draftId")) {
+      $(document).data(X_VBP_TEMPLATE, docTemplate);
+      trace("edit::init restored X_VBP_TEMPLATE", docTemplate);
+    }
+/*
+  } else {
+    setTimeout(() => {
+      const query = new URLSearchParams(window.location.search);
+      $(document).data(X_VBP_TEMPLATE, { pageId: query.get("pageId") });
+    });
+*/
+  }
+
+  checkLocation();
 
   const ed = AJS.Rte.getEditor();
 
@@ -92,6 +111,18 @@ export default () => {
     $(document).data("bvn-ajax-hook-installed", true);
   }
 
+  $(document).ajaxSend((e,xhr,options) => {
+    if (
+        options.type === "POST" && options.url.indexOf("/rest/api/content?") >= 0
+      || options.type === "PUT" && options.url.indexOf("/rest/api/content/") >= 0
+      || options.type === "POST" && options.url.indexOf("/rest/api/content/blueprint/instance/") >= 0
+    ){
+      if ($(document).data(X_VBP_TEMPLATE)) {
+        xhr.setRequestHeader(X_VBP_TEMPLATE, JSON.stringify($(document).data(X_VBP_TEMPLATE)));
+      }
+    }
+  });
+
   // Install ajax hook to track certain API calls
   $(document).ajaxError((e,xhr,options) => {
     if (
@@ -123,6 +154,12 @@ export default () => {
 
   $(document).ajaxSuccess((e,xhr,options) => {
     if (
+        options.type === "POST"
+      && options.url.indexOf("/rest/create-dialog/1.0/content-blueprint/create-draft") >= 0
+    ){
+      trace("from template", xhr.responseJSON);
+      trace("from template", options);
+    } else if (
         options.type === "POST"
       && options.url.indexOf("/rest/tinymce/1/drafts") >= 0
       && xhr.status === 200

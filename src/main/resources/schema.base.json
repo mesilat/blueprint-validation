@@ -5,6 +5,13 @@
     "required": [],
     "additionalProperties": false,
     "definitions": {
+        "vbp-text": {
+            "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string"} },
+                { "type": "null" }
+            ]
+        },
         "vbp-boolean": {
             "anyOf": [
                 { "type": "boolean" },
@@ -81,6 +88,9 @@
                 { "type": "array", "items": { "$ref": "#/definitions/vbp-user-obj" } },
                 { "type": "null" }
             ]
+        },
+        "vbp-any": {
+            "type": [ "string", "number", "integer", "boolean", "null", "array", "object" ]
         }
     }
 }

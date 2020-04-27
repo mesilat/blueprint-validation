@@ -9,26 +9,18 @@ window.require("confluence/module-exporter")
 });
 
 const getTemplateSetting = async templateKey => get(`/rest/blueprint-validation/1.0/template/${templateKey}`);
-const createTemplateSetting = async data => post("/rest/blueprint-validation/1.0/template", data);
-const updateTemplateSetting = async (templateKey, data) => put(`/rest/blueprint-validation/1.0/template/${templateKey}`, data);
+const setValidationMode = async data => post("/rest/blueprint-validation/1.0/template", data);
 const uploadTemplateContent = async (templateKey, data) => putXml(`/rest/blueprint-validation/1.0/template/${templateKey}/content`, data);
 const uploadTemplateSchema = async (templateKey, data) => put(`/rest/blueprint-validation/1.0/template/${templateKey}/schema`, {}, { data });
 
-async function updateValidationMode(newVal, oldVal, $tr) {
-  if (oldVal.validationMode !== newVal.validationMode) {
-    try {
-      const val = (!oldVal.templateKey)
-        ? await createTemplateSetting(newVal)
-        : await updateTemplateSetting(oldVal.templateKey, newVal);
-
-      const $td = $tr.find("td:last-child a").text(VALIDATION_MODES[val.validationMode].name);
-      flash($td); // flash to confirm mode had changed
-      return val;
-    } catch(err) {
-      notifyError(AJS.I18n.getText("com.mesilat.general.error"), err.message);
-      return oldVal;
-    }
-  } else {
+async function updateValidationMode(templateKey, validationMode, $tr) {
+  try {
+    const val = await setValidationMode({ templateKey, validationMode });
+    const $td = $tr.find("td:last-child a").text(VALIDATION_MODES[val.validationMode].name);
+    flash($td); // flash to confirm mode had changed
+    return val;
+  } catch(err) {
+    notifyError(AJS.I18n.getText("com.mesilat.general.error"), err.message);
     return oldVal;
   }
 }
@@ -47,11 +39,15 @@ async function upload(templateKey, e, loaderFunc) {
       if (e.target.error) {
         throw e.target.error;
       }
-      await loaderFunc(templateKey, e.target.result);
-      notifySuccess(
-        AJS.I18n.getText("com.mesilat.general.success"),
-        AJS.I18n.getText("com.mesilat.vbp.template.upload.success")
-      );
+      try {
+        await loaderFunc(templateKey, e.target.result);
+        notifySuccess(
+          AJS.I18n.getText("com.mesilat.general.success"),
+          AJS.I18n.getText("com.mesilat.vbp.template.upload.success")
+        );
+      } catch(err) {
+        notifyError(AJS.I18n.getText("com.mesilat.general.error"), err.message);
+      }
     };
     reader.readAsText(e.target.files[0]);
   } catch(err) {
@@ -90,7 +86,7 @@ export default function initTemplatesTable($table){
     $actions.find(`aui-option[value="${settings.validationMode}"]`).attr("selected", true);
     $actions.find("aui-select").on("change", async (e) => {
       const validationMode = $(e.target).val();
-      settings = await updateValidationMode({ templateKey, templateName, validationMode }, settings, $tr);
+      settings = await updateValidationMode(templateKey, validationMode, $tr);
     });
     $actions.find("#com-mesilat-vbp-template-upload-content").on("change", (e) => {
       uploadContent(templateKey, e);

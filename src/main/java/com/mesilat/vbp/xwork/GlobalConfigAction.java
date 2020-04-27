@@ -2,6 +2,7 @@ package com.mesilat.vbp.xwork;
 
 import com.atlassian.confluence.core.ConfluenceActionSupport;
 import com.atlassian.confluence.pages.templates.PageTemplate;
+import com.atlassian.confluence.pages.templates.PageTemplateManager;
 import com.atlassian.confluence.plugins.createcontent.ContentBlueprintManager;
 import com.atlassian.confluence.plugins.createcontent.extensions.ContentTemplateModuleDescriptor;
 import com.atlassian.plugin.ModuleDescriptor;
@@ -21,6 +22,8 @@ public class GlobalConfigAction extends ConfluenceActionSupport {
 
     @ComponentImport
     private final ContentBlueprintManager contentBlueprintManager;
+    @ComponentImport
+    private final PageTemplateManager pageTemplateManager;
     private final TemplateManager templateManager;
     private final ValidatorManager validatorManager;
 
@@ -57,23 +60,33 @@ public class GlobalConfigAction extends ConfluenceActionSupport {
             blueprint.getContentTemplateRefs().forEach(contentTemplateRef -> {
                 String key = contentTemplateRef.getModuleCompleteKey();
                 Template template = templateManager.get(key);
+                ModuleDescriptor contentTemplateModuleDescriptor = pluginAccessor.getEnabledPluginModule(key);
                 TemplateWrapper templateWrapper;
-                if (template == null) {
-                    ModuleDescriptor contentTemplateModuleDescriptor = pluginAccessor.getEnabledPluginModule(key);
-                    if (contentTemplateModuleDescriptor instanceof ContentTemplateModuleDescriptor) {
-                        PageTemplate e = ((ContentTemplateModuleDescriptor) contentTemplateModuleDescriptor).getModule();
-                        templateWrapper = new TemplateWrapper(key, e.getName(), Template.ValidationMode.NONE);
-                    } else {
-                        return;
-                    }
+                if (contentTemplateModuleDescriptor instanceof ContentTemplateModuleDescriptor) {
+                    PageTemplate pageTemplate = ((ContentTemplateModuleDescriptor) contentTemplateModuleDescriptor).getModule();
+                    templateWrapper = new TemplateWrapper(key, pageTemplate.getName(),
+                        template == null? Template.ValidationMode.NONE: template.getValidationMode()
+                    );
                 } else {
-                    templateWrapper = new TemplateWrapper(template);
+                    return;
                 }
                 String url = String.format("%s/plugins/createcontent/edit-template.action?key=&contentTemplateRefId=%s", baseUrl, contentTemplateRef.getId().toString());
                 templateWrapper.setUrl(url);
                 templateWrapper.setUploadEnabled(false);
                 templates.add(templateWrapper);
             });
+        });
+        pageTemplateManager.getGlobalPageTemplates().forEach(t -> {
+            PageTemplate pageTemplate = (PageTemplate)t;
+            String key = Long.toString(pageTemplate.getId());
+            Template template = templateManager.get(key);
+            TemplateWrapper templateWrapper = new TemplateWrapper(key, pageTemplate.getName(),
+                template == null? Template.ValidationMode.NONE: template.getValidationMode()
+            );
+            String url = String.format("%s/pages/templates2/editpagetemplate.action?entityId=%d", baseUrl, pageTemplate.getId());
+            templateWrapper.setUrl(url);
+            templateWrapper.setUploadEnabled(false);
+            templates.add(templateWrapper);
         });
                 
         return templates;
@@ -93,11 +106,13 @@ public class GlobalConfigAction extends ConfluenceActionSupport {
     public GlobalConfigAction(
         ContentBlueprintManager contentBlueprintManager,
         TemplateManager templateManager,
-        ValidatorManager validatorManager
+        ValidatorManager validatorManager,
+        PageTemplateManager pageTemplateManager
     ){
         this.contentBlueprintManager = contentBlueprintManager;
         this.templateManager = templateManager;
         this.validatorManager = validatorManager;
+        this.pageTemplateManager = pageTemplateManager;
     }
 
     public static class ValidatorType {

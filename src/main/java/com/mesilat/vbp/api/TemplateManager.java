@@ -5,8 +5,7 @@ import java.util.List;
 public interface TemplateManager {
     List<Template> list(boolean schemas);
     Template get(String templateKey);
-    void delete(String templateKey);
-    void create(Template template);
-    void create(List<Template> templates);
-    void update(String templateKey, Template template);
+    void setValidationMode(String templateKey, Template.ValidationMode validationMode);
+    void setSchema(String templateKey, String schema);
+    void clear(String templateKey);
 }

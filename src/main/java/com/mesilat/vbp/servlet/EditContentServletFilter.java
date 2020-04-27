@@ -10,13 +10,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import static com.mesilat.vbp.Constants.X_BLUEPRINT_VALIDATION;
 import static com.mesilat.vbp.Constants.X_BLUEPRINT_VALIDATION_TASK;
 import com.mesilat.vbp.api.DataService;
-import com.mesilat.vbp.api.ParseException;
 import com.mesilat.vbp.api.ParserService;
 import com.mesilat.vbp.api.Template;
 import com.mesilat.vbp.api.Template.ValidationMode;
 import com.mesilat.vbp.api.TemplateManager;
 import com.mesilat.vbp.api.TextConverterService;
-import com.mesilat.vbp.api.ValidationException;
 import com.mesilat.vbp.api.ValidationService;
 import java.io.IOException;
 import java.io.InputStream;
@@ -81,13 +79,27 @@ public class EditContentServletFilter extends PageServletBase implements Filter 
             chain.doFilter(wrappedRequest, resp);
             return;
         }
-        String templateKey = page.getProperties().getStringProperty(PROPERTY_TEMPLATE);
-        if (templateKey == null) {
-            response.setHeader(X_BLUEPRINT_VALIDATION, "not validated");
-            chain.doFilter(wrappedRequest, resp);
-            return;
+
+        String templateKey = null;
+        Template template = null;
+        if (obj.has("extensions") && obj.get("extensions").has("sourceTemplateId")) {
+            templateKey = obj.get("extensions").get("sourceTemplateId").asText();
+            if (templateKey == null) {
+                response.setHeader(X_BLUEPRINT_VALIDATION, "not validated");
+                chain.doFilter(wrappedRequest, resp);
+                return;
+            }
+            template = templateManager.get(templateKey);
+        } else {
+            templateKey = page.getProperties().getStringProperty(PROPERTY_TEMPLATE);
+            if (templateKey == null) {
+                response.setHeader(X_BLUEPRINT_VALIDATION, "not validated");
+                chain.doFilter(wrappedRequest, resp);
+                return;
+            }
+            template = templateManager.get(templateKey);
         }
-        Template template = templateManager.get(templateKey);
+
         if (template == null || template.getValidationMode() == null || template.getValidationMode() == ValidationMode.NONE) {
             response.setHeader(X_BLUEPRINT_VALIDATION, "not validated");
             chain.doFilter(wrappedRequest, resp);
@@ -118,9 +130,10 @@ public class EditContentServletFilter extends PageServletBase implements Filter 
             chain.doFilter(wrappedRequest, resp);
             validationService.registerValidationTask(uuid, page.getId(), page.getTitle());
 
+            String _templateKey = template.getTemplateKey();
             Thread t = new Thread(() -> {
                 // Do validation
-                this.postValidate(uuid, page, template.getTemplateKey());
+                this.postValidate(uuid, page, _templateKey);
             });
             t.start();
         }

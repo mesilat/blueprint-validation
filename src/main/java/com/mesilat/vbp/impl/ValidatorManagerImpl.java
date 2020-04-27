@@ -5,6 +5,9 @@ import com.mesilat.vbp.api.Validator;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.mesilat.vbp.Constants;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -15,12 +18,29 @@ import javax.inject.Named;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
 import com.mesilat.vbp.api.ValidatorManager;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 
 @ExportAsService ({ValidatorManager.class})
 @Named ("vbpValidatorManager")
-public class ValidatorManagerImpl implements ValidatorManager {
-    private final ActiveObjects ao;
+public class ValidatorManagerImpl implements ValidatorManager, InitializingBean, DisposableBean {
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Constants.PLUGIN_KEY);
 
+    private final ActiveObjects ao;
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Thread t = new Thread(() -> installValidators());
+        t.start();
+    }
+    @Override
+    public void destroy() throws Exception {
+    }
     @Override
     public List<Validator> list(boolean extensive) {
         return Arrays.asList(ao.find(ValidatorInfo.class, Query.select("CODE, NAME")))
@@ -28,17 +48,14 @@ public class ValidatorManagerImpl implements ValidatorManager {
             .map(info -> extensive? ValidatorInfo.toValidator(info) :new Validator(info.getCode(), info.getName()))
             .collect(Collectors.toList());
     }
-
     @Override
     public Validator get(String code) {
         return ValidatorInfo.toValidator(ao.get(ValidatorInfo.class, code));
     }
-
     @Override
     public void delete(String code) {
         ao.deleteWithSQL(ValidatorInfo.class, "CODE = ?", code);
     }
-
     @Override
     public void create(Validator validator) {
         ao.executeInTransaction(() -> {
@@ -69,7 +86,6 @@ public class ValidatorManagerImpl implements ValidatorManager {
         info.setModule(validator.getModule());
         info.save();        
     }
-
     @Override
     public void update(String code, Validator validator) {
         ao.executeInTransaction(() -> {
@@ -92,12 +108,10 @@ public class ValidatorManagerImpl implements ValidatorManager {
             return null;
         });
     }
-
     @Override
     public boolean contains(String code) {
         return ao.count(ValidatorInfo.class, "CODE = ?", code) > 0;
     }
-
     @Override
     public String css() {
         Map<String,String> prompts = new HashMap<>();
@@ -162,7 +176,35 @@ public class ValidatorManagerImpl implements ValidatorManager {
 
         return sb.toString();
     }
-   
+
+    private void installValidators() {
+        try {
+            ao.moduleMetaData().awaitInitialization();
+        } catch (ExecutionException | InterruptedException ex) {
+            LOGGER.warn("Error waiting for AO to start", ex);
+        }
+        ao.executeInTransaction(() -> {
+            int count = ao.count(ValidatorInfo.class);
+            if (count == 0) {
+                try (InputStream in = this.getClass().getResourceAsStream("/validators.json")) {
+                    ArrayNode arr = (ArrayNode)mapper.readTree(in);
+                    arr.forEach(obj -> {
+                        Validator validator = new Validator(obj.get("code").asText(), obj.has("name")? obj.get("name").asText(): null);
+                        validator.setType(obj.get("type").asText());
+                        validator.setPrompt(obj.has("prompt")? obj.get("prompt").asText(): null);
+                        validator.setWarning(obj.has("warning")? obj.get("warning").asText(): null);
+                        validator.setText(obj.has("text")? obj.get("text").asText(): null);
+                        validator.setModule(obj.has("module")? obj.get("module").asText(): null);
+                        this.create(validator);
+                    });
+                } catch (IOException ex) {
+                    LOGGER.warn("Failed to read validators from resource \"/validators.json\"", ex);
+                }
+            }
+            return null;
+        });
+    }
+
     @Inject
     public ValidatorManagerImpl(final @ComponentImport ActiveObjects ao){
         this.ao = ao;

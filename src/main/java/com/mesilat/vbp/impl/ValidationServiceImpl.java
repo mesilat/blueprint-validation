@@ -5,7 +5,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
@@ -41,6 +41,7 @@ public class ValidationServiceImpl implements ValidationService, InitializingBea
     private final ParserService parserService;
     @ComponentImport
     private final I18nResolver resolver;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     private final Map<String,ValidationTask> tasks = new HashMap<>();
     private Thread thread;
@@ -81,21 +82,17 @@ public class ValidationServiceImpl implements ValidationService, InitializingBea
     }
 
     @Override
-    public void validate(String templateKey, ObjectNode data) throws ValidationException {
+    public void validate(String templateKey, String data) throws ValidationException {
         try {
-            JsonNode schema;
             Template template = templateManager.get(templateKey);
-            if (template.getSchema() == null) {
-                schema = parserService.generateSchemaForTemplate(templateKey);
-            } else {
-                schema = JsonLoader.fromString(template.getSchema());                
-            }
-            if (schema == null) {
-                throw new ValidationException("No JSON schema exists for template or could be generated");
-            }
+            JsonNode schema = JsonLoader.fromString(
+                template.getSchema() == null?
+                parserService.generateSchemaForTemplate(templateKey):
+                template.getSchema()
+            );
 
             JsonValidator validator = factory.getValidator();
-            ProcessingReport report = validator.validate(schema, data);
+            ProcessingReport report = validator.validate(schema, mapper.readTree(data));
             if (!report.isSuccess()) {
                 StringBuilder sb = new StringBuilder();
                 report.forEach(processingMessage -> {
@@ -108,7 +105,7 @@ public class ValidationServiceImpl implements ValidationService, InitializingBea
                 throw new ValidationException(message);
             }
         } catch (IOException | ProcessingException | ParseException ex) {
-            throw new ValidationException("Validation failed", ex);
+            throw new ValidationException(ex.getMessage());
         }
     }
 
@@ -127,7 +124,7 @@ public class ValidationServiceImpl implements ValidationService, InitializingBea
     }
 
     @Override
-    public void runValidationTask(String uuid, String templateKey, ObjectNode data) throws ValidationException {
+    public void runValidationTask(String uuid, String templateKey, String data) throws ValidationException {
         ValidationTask task;
         synchronized(tasks) {
             task = tasks.get(uuid);

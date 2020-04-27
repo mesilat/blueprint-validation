@@ -34,13 +34,13 @@ public class SpaceConfigAction extends SpaceAdminAction {
         List<TemplateWrapper> templates = new ArrayList<>();
         pageTemplates.forEach(pt -> {
             PageTemplate pageTemplate = (PageTemplate)pt;
-            if (pageTemplate.getModuleKey() != null) {
+            if (pageTemplate.getModuleKey() != null || pageTemplate.isGlobalPageTemplate()) {
                 return; // global templates are configured elsewhere
             }
             Template template = manager.get(Long.toString(pageTemplate.getId()));
             TemplateWrapper templateWrapper = (template == null)?
                 new TemplateWrapper(Long.toString(pageTemplate.getId()), pageTemplate.getName(), Template.ValidationMode.NONE):
-                new TemplateWrapper(template);
+                new TemplateWrapper(template, pageTemplate.getName());
             String url = String.format("%s/pages/templates2/viewpagetemplate.action?entityId=%d&key=%s", baseUrl, pageTemplate.getId(), space.getKey());
             templateWrapper.setUrl(url);
             templateWrapper.setUploadEnabled(true);

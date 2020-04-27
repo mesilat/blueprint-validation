@@ -4,6 +4,7 @@ import com.mesilat.vbp.api.Template;
 
 public class TemplateWrapper extends Template {
     private String url;
+    private String templateName;
     private boolean uploadEnabled = true;
 
     public String getUrl() {
@@ -18,17 +19,25 @@ public class TemplateWrapper extends Template {
     public void setUploadEnabled(boolean uploadEnabled) {
         this.uploadEnabled = uploadEnabled;
     }
+    public String getTemplateName() {
+        return templateName;
+    }
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
+    }
 
     public TemplateWrapper() {
     }
-    public TemplateWrapper(Template template) {
-        super(template.getTemplateKey(), template.getTemplateName(), template.getValidationMode());
-        this.setSchema(template.getSchema());
+    public TemplateWrapper(Template template, String templateName) {
+        super(template.getTemplateKey(), template.getValidationMode());
+        this.templateName = templateName;
     }
     public TemplateWrapper(String templateKey, String templateName, String validationMode) {
-        super(templateKey, templateName, validationMode);
+        super(templateKey, validationMode);
+        this.templateName = templateName;
     }
     public TemplateWrapper(String templateKey, String templateName, ValidationMode validationMode) {
-        super(templateKey, templateName, validationMode);
+        super(templateKey, validationMode);
+        this.templateName = templateName;
     }
 }

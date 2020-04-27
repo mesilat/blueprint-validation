@@ -16,10 +16,24 @@ public class DataServiceImpl implements DataService {
     private final ActiveObjects ao;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @Override
     public ObjectNode getPageInfo(Long pageId) {
         PageInfo info = ao.get(PageInfo.class, pageId);
-        return (info == null)? null: PageInfo.toObjectNode(mapper, info);
+        return info == null? null: PageInfo.toObjectNode(mapper, info);
+    }
+    @Override
+    public String getPageData(Long pageId) {
+        PageInfo info = ao.get(PageInfo.class, pageId);
+        return info == null? null: info.getData();
+    }
+    @Override
+    public boolean isPageValid(Long pageId) {
+        PageInfo info = ao.get(PageInfo.class, pageId);
+        return info == null? null: info.isValid();
+    }
+    @Override
+    public String getPageValidationMessage(Long pageId) {
+        PageInfo info = ao.get(PageInfo.class, pageId);
+        return info == null? null: info.getValidationMessage();
     }
     @Override
     public void createPageInfo(Page page, String templateKey, Boolean isValid, String message, String data) {

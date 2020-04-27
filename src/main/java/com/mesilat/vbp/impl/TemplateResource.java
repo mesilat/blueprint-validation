@@ -98,6 +98,7 @@ public class TemplateResource extends ResourceBase {
                 .entity("Template settings could not be found")
                 .build();
         } else {
+            template.setSchema(null); // not required
             return Response.ok(template).build();
         }
     }
@@ -113,7 +114,7 @@ public class TemplateResource extends ResourceBase {
         }
 
         LOGGER.trace(String.format("Create template settings for template %s", template.getTemplateKey()));
-        service.create(template);
+        service.setValidationMode(template.getTemplateKey(), template.getValidationMode());
         return get(template.getTemplateKey());
     }
 
@@ -128,15 +129,8 @@ public class TemplateResource extends ResourceBase {
         }
 
         LOGGER.trace(String.format("Update template settings for template %s", templateKey));
-        if (templateKey == null) {
-            return Response
-                .status(Response.Status.BAD_REQUEST)
-                .entity("Template key is not defined")
-                .build();
-        } else {
-            service.update(templateKey, template);
-            return get(template.getTemplateKey());
-        }
+        service.setValidationMode(templateKey, template.getValidationMode());
+        return get(template.getTemplateKey());
     }
     
     @DELETE
@@ -148,7 +142,7 @@ public class TemplateResource extends ResourceBase {
         }
 
         LOGGER.trace(String.format("Delete template settings for template %s", templateKey));
-        service.delete(templateKey);
+        service.clear(templateKey);
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
@@ -250,19 +244,7 @@ public class TemplateResource extends ResourceBase {
         }
 
         LOGGER.trace(String.format("Upload JSON schema for template %s", templateKey));
-        Template template = service.get(templateKey);
-        if (template == null) {
-            PageTemplate pageTemplate = getPageTemplateByModuleKey(templateKey);
-            if (pageTemplate == null) {
-                return Response.status(Status.NOT_FOUND).entity("Page template could not be found").build();
-            }
-            template = new Template(Long.toString(pageTemplate.getId()), pageTemplate.getTitle(), Template.ValidationMode.NONE);
-            template.setSchema(schema);
-            service.create(template);
-        } else {
-            template.setSchema(schema);
-            service.update(template.getTemplateKey(), template);
-        }
+        service.setSchema(templateKey, schema);
         return Response.status(Status.ACCEPTED).build();
     }
 
@@ -275,7 +257,8 @@ public class TemplateResource extends ResourceBase {
         if (template == null || template.getSchema() == null) {
             return schema(templateKey);
         } else {
-            String fileName = String.format("%s.json", template.getTemplateName());
+            PageTemplate pageTemplate = getPageTemplateByModuleKey(templateKey);
+            String fileName = String.format("%s.json", pageTemplate == null? pageTemplate.getName(): templateKey);
             return Response.status(Response.Status.OK)
                 .header(CONTENT_DISPOSITION, 
                     getBrowserFamily() == UserAgentUtil.BrowserFamily.FIREFOX

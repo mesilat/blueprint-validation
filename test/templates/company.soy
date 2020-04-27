@@ -1,0 +1,41 @@
+{namespace Templates}
+
+/**
+ * Page template
+ * @param data
+ */
+{template .company}
+<table class="wrapped">
+  <colgroup> <col/> <col/> </colgroup>
+  <tbody>
+    <tr>
+      <th>Title</th>
+      <td class="dsattr-title">{$data.title}</td>
+    </tr>
+    <tr>
+      <th>Position</th>
+      <td class="dsattr-position" style="text-align: right;">{$data.position}</td>
+    </tr>
+    <tr>
+      <th>Value, USD Bln</th>
+      <td class="dsattr-value" style="text-align: right;">{$data.value}</td>
+    </tr>
+    <tr>
+      <th>Assets, USD Bln</th>
+      <td class="dsattr-assets" style="text-align: right;">{$data.assets}</td>
+    </tr>
+    <tr>
+      <th>Sales, USD Bln</th>
+      <td class="dsattr-sales" style="text-align: right;">{$data.sales}</td>
+    </tr>
+    <tr>
+      <th>Profits, USD Bln</th>
+      <td class="dsattr-profits" style="text-align: right;">{$data.profits}</td>
+    </tr>
+    <tr>
+      <th>Country</th>
+      <td class="dsattr-country">{$data.country}</td>
+    </tr>
+  </tbody>
+</table>
+{/template}

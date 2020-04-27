@@ -12,12 +12,15 @@ import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.atlassian.sal.api.user.UserManager;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mesilat.blueprints.parser.DefaultPageResolver;
 import com.mesilat.blueprints.parser.DefaultUserResolver;
 import com.mesilat.vbp.api.ParseException;
 import com.mesilat.vbp.api.ParserService;
 import java.io.StringReader;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -45,31 +48,34 @@ public class ParserServiceImpl implements ParserService {
     @ComponentImport
     private final PluginAccessor pluginAccessor;
     private final XmlEventReaderFactory xmlEventReaderFactory;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public ObjectNode parse(String storgeFormat, String spaceKey) throws ParseException {
+    public String parse(String storgeFormat, String spaceKey) throws ParseException {
         try (StringReader sr = new StringReader(storgeFormat)) {
             XMLEventReader reader = xmlEventReaderFactory.createStorageXmlEventReader(sr);
             UserResolver userResolver = new DefaultUserResolver(userManager);
             PageResolver pageResolver = new DefaultPageResolver(pageManager, spaceKey);
-            return DataParser.parse(reader, userResolver, pageResolver, EXTRA_TRACE);
-        } catch (XMLStreamException ex) {
+            ObjectNode node = DataParser.parse(reader, userResolver, pageResolver, EXTRA_TRACE);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        } catch (XMLStreamException | JsonProcessingException ex) {
             throw new ParseException(ex);
         }
     }
 
     @Override
-    public ObjectNode generateSchema(String storgeFormat) throws ParseException {
+    public String generateSchema(String storgeFormat) throws ParseException {
         try (StringReader sr = new StringReader(storgeFormat)) {
             XMLEventReader reader = xmlEventReaderFactory.createStorageXmlEventReader(sr);
-            return SchemaParser.parse(reader, EXTRA_TRACE);
-        } catch (XMLStreamException ex) {
+            ObjectNode node = SchemaParser.parse(reader, EXTRA_TRACE);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        } catch (XMLStreamException | JsonProcessingException ex) {
             throw new ParseException(ex);
         }
     }
 
     @Override
-    public ObjectNode generateSchemaForTemplate(String templateKey) throws ParseException {
+    public String generateSchemaForTemplate(String templateKey) throws ParseException {
         PageTemplate pageTemplate = getPageTemplateByModuleKey(templateKey);
         if (pageTemplate == null) {
             return null;
@@ -77,8 +83,9 @@ public class ParserServiceImpl implements ParserService {
 
         try (StringReader sr = new StringReader(pageTemplate.getContent())) {
             XMLEventReader reader = xmlEventReaderFactory.createStorageXmlEventReader(sr);
-            return SchemaParser.parse(reader, EXTRA_TRACE);
-        } catch (XMLStreamException ex) {
+            ObjectNode node = SchemaParser.parse(reader, EXTRA_TRACE);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        } catch (XMLStreamException | JsonProcessingException ex) {
             throw new ParseException(ex);
         }
     }

@@ -50,9 +50,9 @@ public class PageServletBase {
     ) throws ParseException, ValidationException, IOException, ServletException {
         String storageFormat = getStorageFormat(obj);
 
-        ObjectNode data = parserService.parse(storageFormat, spaceKey);
+        String data = parserService.parse(storageFormat, spaceKey);
         validationService.validate(templateKey, data);
-        eventPublisher.publish(new DataValidateEvent(null, data));
+        eventPublisher.publish(new DataValidateEvent(data));
         resp.setHeader(X_BLUEPRINT_VALIDATION, "valid");
 
         Long pageId = doProcess(req, resp, chain);
@@ -86,9 +86,9 @@ public class PageServletBase {
     ) throws ParseException, ValidationException, IOException, ServletException {
         String storageFormat = getStorageFormat(obj);
 
-        ObjectNode data = parserService.parse(storageFormat, spaceKey);
+        String data = parserService.parse(storageFormat, spaceKey);
         validationService.validate(templateKey, data);
-        eventPublisher.publish(new DataValidateEvent(page, data));
+        eventPublisher.publish(new DataValidateEvent(data));
 
         chain.doFilter(req, resp);
 
@@ -103,7 +103,7 @@ public class PageServletBase {
     }
     protected void postValidate(String uuid, Page page, String templateKey) {
         String storageFormat = page.getBodyContent().getBody();
-        ObjectNode data;
+        String data;
         try {
             data = parserService.parse(storageFormat, page.getSpaceKey());
         } catch (ParseException ex) {
@@ -122,7 +122,7 @@ public class PageServletBase {
         transactionTemplate.execute(() -> {
             try {
                 validationService.runValidationTask(uuid, templateKey, data);
-                eventPublisher.publish(new DataValidateEvent(page, data));
+                eventPublisher.publish(new DataValidateEvent(data));
                 dataService.createPageInfo(page, templateKey, true, null, _json);
             } catch (Throwable ex) {
                 dataService.createPageInfo(page, templateKey, false, ex.getMessage(), _json);
@@ -168,6 +168,12 @@ public class PageServletBase {
         data.put("reason", "JSON Validation");
         obj.set("data", data);
         return obj;
+    }
+    protected void setPageProperty(Page page, String templateKey) {
+        transactionTemplate.execute(() -> {
+            page.getProperties().setStringProperty(PROPERTY_TEMPLATE, templateKey);
+            return null;
+        });
     }
 
     public PageServletBase(

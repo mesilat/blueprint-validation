@@ -16,10 +16,6 @@ public interface TemplateInfo extends RawEntity<String> {
     public String getTemplateKey();
     void setTemplateKey(String templateKey);
 
-    @StringLength(StringLength.MAX_LENGTH)
-    public String getTemplateName();
-    void setTemplateName(String templateName);
-
     @StringLength(4)
     String getValidationMode();
     void setValidationMode(String validationMode);
@@ -34,7 +30,6 @@ public interface TemplateInfo extends RawEntity<String> {
         }
         Template template = new Template();
         template.setTemplateKey(info.getTemplateKey());
-        template.setTemplateName(info.getTemplateName());
         template.setValidationMode(info.getValidationMode() == null? null: ValidationMode.valueOf(info.getValidationMode()));
         template.setSchema(info.getSchema());
         return template;

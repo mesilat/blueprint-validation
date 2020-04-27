@@ -1,8 +1,8 @@
 import $ from "jquery";
-import { PLUGIN_KEY, TRACE_ENABLED } from "./constants";
+import { PLUGIN_KEY, VBP_TRACE_ENABLED } from "./constants";
 
 export function trace(){
-  const traceEnabled = !!window.localStorage[TRACE_ENABLED];
+  const traceEnabled = !!window.localStorage[VBP_TRACE_ENABLED];
   if (traceEnabled){
     const args = [PLUGIN_KEY];
     for (let i = 0; i < arguments.length; i++) {

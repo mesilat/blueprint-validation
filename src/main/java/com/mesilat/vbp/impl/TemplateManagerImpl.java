@@ -27,70 +27,39 @@ public class TemplateManagerImpl implements TemplateManager {
             .map(
                 info -> schemas
                 ? TemplateInfo.toTemplate(info)
-                : new Template(info.getTemplateKey(), info.getTemplateName(), info.getValidationMode())
+                : new Template(info.getTemplateKey(), info.getValidationMode())
             )
             .collect(Collectors.toList());
     }
-
     @Override
     public Template get(String templateKey) {
         return TemplateInfo.toTemplate(ao.get(TemplateInfo.class, templateKey));
     }
-
     @Override
-    public void delete(String templateKey) {
+    public void setValidationMode(String templateKey, Template.ValidationMode validationMode) {
+        TemplateInfo info = ao.get(TemplateInfo.class, templateKey);
+        if (info == null) {
+            ao.create(TemplateInfo.class, new DBParam("TEMPLATE_KEY", templateKey), new DBParam("VALIDATION_MODE", validationMode.toString()));
+        } else {
+            info.setValidationMode(validationMode.toString());
+            info.save();
+        }
+    }
+    @Override
+    public void setSchema(String templateKey, String schema) {
+        TemplateInfo info = ao.get(TemplateInfo.class, templateKey);
+        if (info == null) {
+            ao.create(TemplateInfo.class, new DBParam("TEMPLATE_KEY", templateKey), new DBParam("SCHEMA", schema));
+        } else {
+            info.setSchema(schema);
+            info.save();
+        }
+    }
+    @Override
+    public void clear(String templateKey) {
         ao.deleteWithSQL(TemplateInfo.class, "TEMPLATE_KEY = ?", templateKey);
     }
 
-    @Override
-    public void create(Template template) {
-        ao.executeInTransaction(() -> {
-            _create(template);
-            return null;
-        });
-    }
-
-    @Override
-    public void create(List<Template> templates) {
-        ao.executeInTransaction(() -> {
-            templates.forEach(template -> {
-                if (ao.count(TemplateInfo.class, "TEMPLATE_KEY = ?", template.getTemplateKey()) == 0) {
-                    _create(template);
-                }
-            });
-            return null;
-        });
-    }
-    private void _create(Template template) {
-        TemplateInfo info = ao.create(TemplateInfo.class,
-            new DBParam("TEMPLATE_KEY", template.getTemplateKey()),
-            new DBParam("TEMPLATE_NAME", template.getTemplateName())
-        );
-        info.setValidationMode(template.getValidationMode() == null? null: template.getValidationMode().toString());
-        info.setSchema(template.getSchema());
-        info.save();        
-    }
-
-    @Override
-    public void update(String templateKey, Template template) {
-        ao.executeInTransaction(() -> {
-            TemplateInfo info = ao.get(TemplateInfo.class, templateKey);
-            if (info == null) {
-                throw new RuntimeException("Template info could not be found");
-            }
-            if (templateKey.equals(template.getTemplateKey())) {
-                info.setTemplateName(template.getTemplateName());
-                info.setValidationMode(template.getValidationMode() == null? null: template.getValidationMode().toString());
-                info.setSchema(template.getSchema());
-                info.save();        
-            } else {
-                delete(templateKey);
-                _create(template);
-            }
-            return null;
-        });
-    }
-  
     @Inject
     public TemplateManagerImpl(final @ComponentImport ActiveObjects ao){
         this.ao = ao;

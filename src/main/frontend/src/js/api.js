@@ -1,5 +1,4 @@
 import $ from "jquery";
-import _ from "lodash";
 import FileSaver from "file-saver";
 
 const DEFAULT_TIMEOUT = 30000;
@@ -23,7 +22,7 @@ function toError(xhr) {
 
 export async function get(url, data, options) {
   return new Promise((resolve, reject) => {
-    $.ajax(_.extend({
+    $.ajax($.extend({
         url: `${AJS.contextPath()}${url}`,
         type: 'GET',
         data,
@@ -35,7 +34,7 @@ export async function get(url, data, options) {
 }
 export async function post(url, data, options) {
   return new Promise((resolve, reject) => {
-    $.ajax(_.extend({
+    $.ajax($.extend({
         url: `${AJS.contextPath()}${url}`,
         type: 'POST',
         data: JSON.stringify(data),
@@ -49,7 +48,7 @@ export async function post(url, data, options) {
 }
 export async function put(url, data, options) {
   return new Promise((resolve, reject) => {
-    $.ajax(_.extend({
+    $.ajax($.extend({
         url: `${AJS.contextPath()}${url}`,
         type: 'PUT',
         data: JSON.stringify(data),
@@ -63,7 +62,7 @@ export async function put(url, data, options) {
 }
 export async function del(url, data, options) {
   return new Promise((resolve, reject) => {
-    $.ajax(_.extend({
+    $.ajax($.extend({
         url: `${AJS.contextPath()}${url}`,
         type: 'DELETE',
         data,
@@ -74,7 +73,7 @@ export async function del(url, data, options) {
 }
 export async function putXml(url, data, options) {
   return new Promise((resolve, reject) => {
-    $.ajax(_.extend({
+    $.ajax($.extend({
         url: `${AJS.contextPath()}${url}`,
         type: 'PUT',
         data,

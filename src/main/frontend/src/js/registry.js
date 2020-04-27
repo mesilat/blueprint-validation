@@ -73,42 +73,48 @@ const registry = {
 };
 
 async function loadValidators() {
+  trace("registry::loadValidators");
   try {
     const validators = await getValidators();
     validators.forEach(validator => {
-      switch (validator.type) {
-        case "LOFV":
-          registry.classes[validator.code] = new ListOfValuesValidator(validator);
-          break;
-        case "REXP":
-          registry.classes[validator.code] = new RegularExpressionValidator(validator);
-          break;
-        case "NUMR":
-          registry.classes[validator.code] = new NumberValidator(validator);
-          break;
-        case "PAGE":
-          registry.classes[validator.code] = new PageValidator(validator);
-          break;
-        case "USER":
-          registry.classes[validator.code] = new UserValidator(validator);
-          break;
-        case "DATE":
-          registry.classes[validator.code] = new DateValidator(validator);
-          break;
-        case "MODL":
-          const Module = window.require(validator.module);
-          if (!Module) {
-            error(`Module ${Module} could not be found`);
-          } else {
-            try {
-              registry.classes[validator.code] = new Module(validator);
-            } catch(err) {
-              error(`Module ${Module} instantiation failed`, err);
+      trace("registry::loadValidators() validator=", validator);
+      try {
+        switch (validator.type) {
+          case "LOFV":
+            registry.classes[validator.code] = new ListOfValuesValidator(validator);
+            break;
+          case "REXP":
+            registry.classes[validator.code] = new RegularExpressionValidator(validator);
+            break;
+          case "NUMR":
+            registry.classes[validator.code] = new NumberValidator(validator);
+            break;
+          case "PAGE":
+            registry.classes[validator.code] = new PageValidator(validator);
+            break;
+          case "USER":
+            registry.classes[validator.code] = new UserValidator(validator);
+            break;
+          case "DATE":
+            registry.classes[validator.code] = new DateValidator(validator);
+            break;
+          case "MODL":
+            const Module = window.require(validator.module);
+            if (!Module) {
+              error(`Module ${Module} could not be found`);
+            } else {
+              try {
+                registry.classes[validator.code] = new Module(validator);
+              } catch(err) {
+                error(`Module ${Module} instantiation failed`, err);
+              }
             }
-          }
-          break;
-        default:
-          // TODO
+            break;
+          default:
+            // TODO
+        }
+      } catch (err) {
+        error(`Failed to init validator "${validator.code}"`, err);
       }
     });
   } catch(err) {

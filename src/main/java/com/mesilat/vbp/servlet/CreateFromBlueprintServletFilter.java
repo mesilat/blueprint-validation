@@ -111,7 +111,10 @@ public class CreateFromBlueprintServletFilter extends PageServletBase implements
                 LOGGER.error(String.format("Page does not exist: %d", pageId));
                 return;
             }
-            page.getProperties().setStringProperty(PROPERTY_TEMPLATE, template.getTemplateKey());
+            transactionTemplate.execute(() -> {
+                page.getProperties().setStringProperty(PROPERTY_TEMPLATE, template.getTemplateKey());
+                return null;
+            });
             validationService.registerValidationTask(uuid, page.getId(), page.getTitle());
 
             Thread t = new Thread(() -> {
