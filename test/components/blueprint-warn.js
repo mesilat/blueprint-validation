@@ -32,7 +32,7 @@ module.exports = async (client, templateId) => {
 
   await page.waitForSelector('#content-title');
   await page.focus('#content-title');
-  delay(500);
+  await delay(500);
   await page.type('#content-title', title);
   await page.waitForSelector('#wysiwygTextarea_ifr');
 

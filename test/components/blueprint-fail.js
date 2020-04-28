@@ -28,8 +28,9 @@ module.exports = async (client, templateId) => {
     document.querySelector('button.create-dialog-create-button.aui-button.aui-button-primary').click()
   });
 
-  await delay(500);
   await page.waitForSelector('#content-title');
+  await page.focus('#content-title');
+  await delay(500);
   await page.type('#content-title', title);
   await page.waitForSelector('#wysiwygTextarea_ifr');
 

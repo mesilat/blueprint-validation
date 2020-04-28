@@ -8,10 +8,14 @@ module.exports = async (client, templateId) => {
   });
 
   await page.goto(`${options.baseaddr}/pages/createpage-entervariables.action?templateId=${templateId}&spaceKey=${options.sampleSpace}`);
-  await page.waitForSelector('#content-title');
-  await page.type('#content-title', 'Page to fail');
-  await page.waitForSelector('#wysiwygTextarea_ifr');
+  const title = 'Page to fail';
 
+  await page.waitForSelector('#content-title');
+  await page.focus('#content-title');
+  delay(500);
+  await page.type('#content-title', title);
+
+  await page.waitForSelector('#wysiwygTextarea_ifr');
   await page.evaluate(() => {
     document.querySelector('#wysiwygTextarea_ifr')
     .contentDocument.querySelector('td.dsattr-value')
@@ -24,8 +28,8 @@ module.exports = async (client, templateId) => {
   });
 
   await page.waitForSelector('#aui-flag-container .aui-message.aui-message-error');
-  const title = await page.evaluate(() => document.querySelector('#aui-flag-container .aui-message.aui-message-error .title').textContent);
-  expect(title).toBe('Validation Error');
+  const messageTitle = await page.evaluate(() => document.querySelector('#aui-flag-container .aui-message.aui-message-error .title').textContent);
+  expect(messageTitle).toBe('Validation Error');
 
   await delay(2000);
 };

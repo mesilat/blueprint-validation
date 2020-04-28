@@ -15,6 +15,8 @@ module.exports = async (client, templateId) => {
 
   await page.goto(`${options.baseaddr}/pages/createpage-entervariables.action?templateId=${templateId}&spaceKey=${options.sampleSpace}`);
   await page.waitForSelector('#content-title');
+  await page.focus('#content-title');
+  await delay(500);
   await page.type('#content-title', title);
   await page.waitForSelector('#wysiwygTextarea_ifr');
 

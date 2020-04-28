@@ -58,32 +58,29 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
             return;
         }
         
+        String xTemplate = request.getHeader(X_VBP_TEMPLATE);
+        ObjectNode templateInfo = xTemplate == null? null: (ObjectNode)mapper.readTree(xTemplate);
+
         Matcher m = CONTENT_ID.matcher(request.getPathInfo());
         if (m.matches()) {
             Long pageId = Long.parseLong(m.group(1));
-            doFilterEdit(request, response, chain, pageId);
+            doFilterEdit(request, response, chain, templateInfo, pageId);
             return;
         }
 
-        String xTemplate = request.getHeader(X_VBP_TEMPLATE);
-        if (xTemplate == null) {
+        if (templateInfo == null) {
+            LOGGER.trace("No X_VBP_TEMPLATE header, not validating");
             response.setHeader(X_BLUEPRINT_VALIDATION, "not validated");
             chain.doFilter(request, resp);
-            return;
-        }
 
-        ObjectNode templateInfo = (ObjectNode)mapper.readTree(xTemplate);
-        if (templateInfo.has("pageId")) {
+        } else if (templateInfo.has("pageId")) {
             Long pageId = templateInfo.get("pageId").isNumber()?
                 templateInfo.get("pageId").asLong():
                 Long.parseLong(templateInfo.get("pageId").asText());
-            doFilterEdit(request, response, chain, pageId);
+            doFilterEdit(request, response, chain, templateInfo, pageId);
 
         } else if (templateInfo.has("validationMode") && templateInfo.has("templateKey")) {
-            String templateKey = templateInfo.get("templateKey").asText();
-            Template.ValidationMode mode = Template.ValidationMode.valueOf(templateInfo.get("validationMode").asText());
-            String spaceKey = templateInfo.has("spaceKey")? templateInfo.get("spaceKey").asText(): null;
-            doFilterCreate(request, response, chain, templateKey, mode, spaceKey);
+            doFilterCreate(request, response, chain, templateInfo);
 
         } else {
             LOGGER.trace("Cannot validate template");
@@ -96,10 +93,12 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
         HttpServletRequest request,
         HttpServletResponse response,
         FilterChain chain,
-        String templateKey,
-        Template.ValidationMode mode,
-        String spaceKey
+        ObjectNode templateInfo
     ) throws IOException, ServletException {
+        String templateKey = templateInfo.get("templateKey").asText();
+        Template.ValidationMode mode = Template.ValidationMode.valueOf(templateInfo.get("validationMode").asText());
+        String spaceKey = templateInfo.has("spaceKey")? templateInfo.get("spaceKey").asText(): null;
+
         switch (mode) {
             case NONE:
                 {
@@ -118,7 +117,8 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                     if (page == null) {
                         LOGGER.error("Failed to get page object");
                         return;
-                    }   super.setPageProperty(page, templateKey);
+                    }
+                    super.setPageProperty(page, templateKey);
                     validationService.registerValidationTask(uuid, page.getId(), page.getTitle());
                     Thread t = new Thread(() -> super.postValidate(uuid, page, templateKey));
                     t.start();
@@ -171,6 +171,7 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
         HttpServletRequest request,
         HttpServletResponse response,
         FilterChain chain,
+        ObjectNode templateInfo,
         Long pageId
     ) throws IOException, ServletException {
         Page page = pageManager.getPage(pageId);
@@ -183,10 +184,14 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
 
         String templateKey = page.getProperties().getStringProperty(PROPERTY_TEMPLATE);
         if (templateKey == null) {
-            LOGGER.warn(String.format("Template key not found for page: %d", pageId));
-            response.setHeader(X_BLUEPRINT_VALIDATION, "not validated");
-            chain.doFilter(request, response);
-            return;
+            if (templateInfo != null) {
+                doFilterCreate(request, response, chain, templateInfo);
+            } else {
+                LOGGER.warn(String.format("Template key not found for page: %d", pageId));
+                response.setHeader(X_BLUEPRINT_VALIDATION, "not validated");
+                chain.doFilter(request, response);
+                return;
+            }
         }
 
         Template template = templateManager.get(templateKey);
