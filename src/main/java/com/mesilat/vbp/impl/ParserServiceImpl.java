@@ -20,7 +20,6 @@ import com.mesilat.blueprints.parser.DefaultUserResolver;
 import com.mesilat.vbp.api.ParseException;
 import com.mesilat.vbp.api.ParserService;
 import java.io.StringReader;
-import java.util.logging.Level;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Named;

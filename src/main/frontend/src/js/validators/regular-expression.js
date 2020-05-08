@@ -1,5 +1,5 @@
 import { SHOW_WARNING, VALUE_MULTI } from "../constants";
-import { error } from "../util";
+import { trace, error } from "../util";
 
 function RegularExpressionValidator(options) {
   this.title = options.name;
@@ -14,19 +14,19 @@ function RegularExpressionValidator(options) {
 }
 
 RegularExpressionValidator.prototype.focusout = function($td, empty, ed) {
-  if (!empty) {
-    setTimeout(() => {
-      if ($td.hasClass(VALUE_MULTI)) {
-        $td[0].textContent.split(",").forEach(text => {
-          text = text.trim();
-          this.showWarningIfNotValid($td, text);
-        });
-      } else {
-        const text = $td[0].textContent.trim();
+  if (empty)
+    return;
+  setTimeout(() => {
+    if ($td.hasClass(VALUE_MULTI)) {
+      $td[0].textContent.split(",").forEach(text => {
+        text = text.trim();
         this.showWarningIfNotValid($td, text);
-      }
-    }, 100);
-  }
+      });
+    } else {
+      const text = $td[0].textContent.trim();
+      this.showWarningIfNotValid($td, text);
+    }
+  }, 100);
 }
 
 RegularExpressionValidator.prototype.showWarningIfNotValid = function($td, text) {

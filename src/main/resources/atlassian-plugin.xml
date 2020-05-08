@@ -8,6 +8,7 @@
   </plugin-info>
 
   <resource type="i18n" name="i18n" location="/i18n/blueprint-validation"/>
+  <resource type="download" name="images/" location="/images"/>
 
   <web-resource key="blueprint-config-resources">
     <dependency>com.atlassian.auiplugin:ajs</dependency>
@@ -53,6 +54,16 @@
     <resource type="download" name="validation-modes.js" location="/js/validation-modes.js"/>
   </web-resource>
 
+  <web-resource key="macro-resources">
+    <transformation extension="js">
+      <transformer key="jsI18n"/>
+    </transformation>
+    <transformation extension="soy">
+      <transformer key="soyTransformer"/>
+    </transformation>
+    <resource type="download" name="macro.soy.js" location="/templates/macro.soy"/>
+  </web-resource>
+
   <!--servlet-filter key="vbp-create-draft-filter2" class="com.mesilat.vbp.servlet.CreateDraftServletFilter2" location="before-dispatch" weight="100">
     <url-pattern>/pages/createpage-entervariables.action</url-pattern>
   </servlet-filter>
@@ -89,7 +100,6 @@
       </condition>
   </web-item>
 
-
   <xwork key="vbp-actions">
     <package name="xwork-package" extends="default" namespace="/plugins/${project.artifactId}">
       <default-interceptor-ref name="validatingStack"/>
@@ -109,5 +119,19 @@
     <entity>com.mesilat.vbp.TemplateInfo</entity>
     <entity>com.mesilat.vbp.PageInfo</entity>
   </ao>
+
+  <xhtml-macro name="vbp-report" class="com.mesilat.vbp.macro.VbpReportMacro" key="vbp-report" state="enabled"
+    icon="/download/resources/${atlassian.plugin.key}/images/pluginLogo.png">
+    <resource type="i18n" name="i18n" location="/i18n/blueprint-validation"/>
+    <category name="reporting"/>
+    <description key="com.mesilat.blueprint-validation.vbp-report.desc"></description>
+    <parameters>
+      <parameter name="templateKey" type="string" />
+      <parameter name="path" type="string" />
+      <parameter name="columns" type="string" />
+      <parameter name="captions" type="string" />
+      <parameter name="order" type="string" />
+    </parameters>
+  </xhtml-macro>
 
 </atlassian-plugin>

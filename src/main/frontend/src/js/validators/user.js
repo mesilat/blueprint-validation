@@ -11,6 +11,14 @@ UserValidator.prototype.focusin = function($td, empty, ed) {
   }
 }
 UserValidator.prototype.focusout = function($td, empty, ed) {
+  if (empty)
+    return;
+
+  setTimeout(() => {
+    if ($td.find('a[data-linked-resource-type="userinfo"]').length === 0) {
+      $td.addClass(SHOW_WARNING);
+    }
+  }, 100);
 }
 
 export default UserValidator;

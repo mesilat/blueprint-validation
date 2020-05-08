@@ -2,7 +2,6 @@ package com.mesilat.vbp.impl;
 
 import com.atlassian.sal.api.websudo.WebSudoNotRequired;
 import com.mesilat.vbp.Constants;
-import com.mesilat.vbp.api.ValidationService;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -19,7 +18,7 @@ import com.mesilat.vbp.impl.ValidationServiceImpl.ValidationTask;
 @WebSudoNotRequired
 public class ValidationResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(Constants.PLUGIN_KEY);
-    private final ValidationService service;
+    private final ValidationServiceEx service;
 
     @GET
     @Path("/{uuid}")
@@ -33,7 +32,7 @@ public class ValidationResource {
     }
 
     @Inject
-    public ValidationResource(ValidationService service){
+    public ValidationResource(ValidationServiceEx service){
         this.service = service;
     }
 }

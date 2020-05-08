@@ -28,6 +28,9 @@ public interface PageInfo extends RawEntity<Long> {
     public Boolean isValid();
     void setValid(Boolean valid);
 
+    public Boolean isDeleted();
+    void setDeleted(Boolean deleted);
+
     @StringLength(StringLength.MAX_LENGTH)
     public String getValidationMessage();
     void setValidationMessage(String validationMessage);

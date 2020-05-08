@@ -1,0 +1,27 @@
+{namespace Mesilat.BlueprintValidation}
+
+/**
+ * Pages report macro
+ * @param? templateKey
+ * @param? path
+ * @param? order 
+ * @param columns
+ * @param captions
+ */
+{template .macroReport}
+<div class="com-mesilat-vbp-report"
+  {if isNonnull($templateKey)}
+    data-template-key="{$templateKey}"
+  {/if}
+  {if isNonnull($path)}
+    data-path="{$path}"
+  {/if}
+  {if isNonnull($order)}
+    data-order="{$order}"
+  {/if}
+  data-columns="{$columns}"
+  data-captions="{$captions}"
+>
+    <span class="aui-icon aui-icon-wait"></span> Loading...
+</div>
+{/template}

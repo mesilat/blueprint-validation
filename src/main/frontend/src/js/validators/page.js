@@ -55,6 +55,14 @@ PageValidator.prototype.focusin = function($td, empty, ed) {
 }
 
 PageValidator.prototype.focusout = function($td, empty, ed) {
+  if (empty)
+    return;
+
+  setTimeout(() => {
+    if ($td.find("a[data-linked-resource-id]").length === 0) {
+      $td.addClass(SHOW_WARNING);
+    }
+  }, 100);
 }
 
 PageValidator.prototype.showAutocomplete = function(ed) {

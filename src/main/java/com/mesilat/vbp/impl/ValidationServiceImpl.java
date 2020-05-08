@@ -1,5 +1,6 @@
 package com.mesilat.vbp.impl;
 
+import com.atlassian.confluence.pages.Page;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.message.I18nResolver;
@@ -17,6 +18,7 @@ import com.mesilat.vbp.api.Template;
 import com.mesilat.vbp.api.TemplateManager;
 import com.mesilat.vbp.api.ValidationException;
 import com.mesilat.vbp.api.ValidationService;
+import static com.mesilat.vbp.servlet.PageServletBase.PROPERTY_TEMPLATE;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -33,14 +35,17 @@ import net.java.ao.schema.StringLength;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
-@ExportAsService ({ValidationService.class})
+@ExportAsService ({ValidationService.class, ValidationServiceEx.class})
 @Named ("vbpValidationService")
-public class ValidationServiceImpl implements ValidationService, InitializingBean, DisposableBean, Runnable {
+public class ValidationServiceImpl implements ValidationServiceEx, InitializingBean, DisposableBean, Runnable {
     private final JsonSchemaFactory factory;
     private final TemplateManager templateManager;
     private final ParserService parserService;
+    private final DataServiceEx dataService;
     @ComponentImport
     private final I18nResolver resolver;
+    @ComponentImport
+    private final TransactionTemplate transactionTemplate;
     private final ObjectMapper mapper = new ObjectMapper();
 
     private final Map<String,ValidationTask> tasks = new HashMap<>();
@@ -86,7 +91,7 @@ public class ValidationServiceImpl implements ValidationService, InitializingBea
         try {
             Template template = templateManager.get(templateKey);
             JsonNode schema = JsonLoader.fromString(
-                template.getSchema() == null?
+                template == null || template.getSchema() == null?
                 parserService.generateSchemaForTemplate(templateKey):
                 template.getSchema()
             );
@@ -106,6 +111,25 @@ public class ValidationServiceImpl implements ValidationService, InitializingBea
             }
         } catch (IOException | ProcessingException | ParseException ex) {
             throw new ValidationException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public void validate(String templateKey, Page page) throws ParseException {
+        String data = parserService.parse(page.getBodyAsString(), page.getSpaceKey());
+        try {
+            validate(templateKey, data);
+            transactionTemplate.execute(() -> {
+                page.getProperties().setStringProperty(PROPERTY_TEMPLATE, templateKey);
+                dataService.createPageInfo(page, templateKey, true, null, data);
+                return null;
+            });
+        } catch (ValidationException ex) {
+            transactionTemplate.execute(() -> {
+                page.getProperties().setStringProperty(PROPERTY_TEMPLATE, templateKey);
+                dataService.createPageInfo(page, templateKey, false, ex.getMessage(), data);
+                return null;
+            });
         }
     }
 
@@ -150,14 +174,16 @@ public class ValidationServiceImpl implements ValidationService, InitializingBea
     @Inject
     public ValidationServiceImpl(
         TransactionTemplate transactionTemplate, TemplateManager templateManager,
-        ParserService parserService, I18nResolver resolver
+        ParserService parserService, I18nResolver resolver, DataServiceEx dataService
     ) {
         this.templateManager = templateManager;
         this.parserService = parserService;
         this.resolver = resolver;
+        this.transactionTemplate = transactionTemplate;
         this.factory = transactionTemplate.execute(() -> {
             return JsonSchemaFactory.byDefault();
         });
+        this.dataService = dataService;
     }
 
     @XmlRootElement

@@ -10,7 +10,6 @@ import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import static com.mesilat.vbp.Constants.X_BLUEPRINT_VALIDATION;
 import static com.mesilat.vbp.Constants.X_BLUEPRINT_VALIDATION_TASK;
-import com.mesilat.vbp.api.DataService;
 import com.mesilat.vbp.api.ParseException;
 import com.mesilat.vbp.api.ParserService;
 import com.mesilat.vbp.api.Template;
@@ -18,8 +17,9 @@ import com.mesilat.vbp.api.Template.ValidationMode;
 import com.mesilat.vbp.api.TemplateManager;
 import com.mesilat.vbp.api.TextConverterService;
 import com.mesilat.vbp.api.ValidationException;
-import com.mesilat.vbp.api.ValidationService;
+import com.mesilat.vbp.impl.DataServiceEx;
 import com.mesilat.vbp.impl.DraftService;
+import com.mesilat.vbp.impl.ValidationServiceEx;
 import static com.mesilat.vbp.servlet.PageServletBase.LOGGER;
 import java.io.IOException;
 import java.io.InputStream;
@@ -130,9 +130,9 @@ public class CreateFromBlueprintServletFilter extends PageServletBase implements
         @ComponentImport PageManager pageManager,
         TemplateManager templateManager,
         TextConverterService textConverterService,
-        ValidationService validationService,
+        ValidationServiceEx validationService,
         ParserService parserService,
-        DataService dataService,
+        DataServiceEx dataService,
         @ComponentImport I18nResolver resolver,
         @ComponentImport TransactionTemplate transactionTemplate,
         @ComponentImport EventPublisher eventPublisher

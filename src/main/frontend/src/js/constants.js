@@ -5,3 +5,5 @@ export const VALUE_MULTI = "dscomma-separated";
 export const VALIDATE_PREFIX = "dsvalidate-";
 export const VBP_TRACE_ENABLED = "VBP_TRACE_ENABLED";
 export const X_VBP_TEMPLATE = "X-Blueprint-Validation-Template";
+export const OBJECTID_PREFIX = "dsobjid-";
+export const OBJECT_CLASS = "dsobject";

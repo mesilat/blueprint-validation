@@ -10,9 +10,9 @@ import com.mesilat.vbp.api.DataService;
 import javax.inject.Named;
 import net.java.ao.DBParam;
 
-@ExportAsService ({DataService.class})
+@ExportAsService ({DataService.class, DataServiceEx.class})
 @Named ("vbpDataService")
-public class DataServiceImpl implements DataService {
+public class DataServiceImpl implements DataServiceEx {
     private final ActiveObjects ao;
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -34,6 +34,10 @@ public class DataServiceImpl implements DataService {
     public String getPageValidationMessage(Long pageId) {
         PageInfo info = ao.get(PageInfo.class, pageId);
         return info == null? null: info.getValidationMessage();
+    }
+    @Override
+    public PageInfo getPageInfo(Page page) {
+        return ao.get(PageInfo.class, page.getId());
     }
     @Override
     public void createPageInfo(Page page, String templateKey, Boolean isValid, String message, String data) {
@@ -67,6 +71,22 @@ public class DataServiceImpl implements DataService {
         pageInfo.setValid(isValid);
         pageInfo.setValidationMessage(message);
         pageInfo.save();
+    }
+    @Override
+    public void deletePageInfo(Page page) {
+        PageInfo pageInfo = ao.get(PageInfo.class, page.getId());
+        if (pageInfo != null) {
+            pageInfo.setDeleted(Boolean.TRUE);
+            pageInfo.save();
+        }
+    }
+    @Override
+    public void undeletePageInfo(Page page) {
+        PageInfo pageInfo = ao.get(PageInfo.class, page.getId());
+        if (pageInfo != null) {
+            pageInfo.setDeleted(Boolean.FALSE);
+            pageInfo.save();
+        }
     }
 
     public DataServiceImpl(ActiveObjects ao) {

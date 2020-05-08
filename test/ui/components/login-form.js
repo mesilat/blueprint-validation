@@ -1,4 +1,4 @@
-const options = require('../.test.settings.js');
+const options = require('../../.test.settings.js');
 const { delay } = require('../util');
 
 module.exports = async () => {

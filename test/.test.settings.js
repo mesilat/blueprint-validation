@@ -1,6 +1,6 @@
 module.exports = {
-  baseaddr: 'http://localhost:8090/wiki',
-  username: 'admin',
-  password: 'pifagor',
+  baseaddr: process.env.DEMO_WIKI_HOME,
+  username: process.env.DEMO_WIKI_USER,
+  password: process.env.DEMO_WIKI_PASSWORD,
   sampleSpace: 'SD123'
 }

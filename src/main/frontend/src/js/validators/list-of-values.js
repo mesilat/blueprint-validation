@@ -21,19 +21,19 @@ ListOfValuesValidator.prototype.focusin = function($td, empty, ed) {
 }
 
 ListOfValuesValidator.prototype.focusout = function($td, empty, ed) {
-  if (!empty){
-    setTimeout(() => {
-      if ($td.hasClass(VALUE_MULTI)) {
-        $td[0].textContent.split(",").forEach(text => {
-          text = text.trim();
-          this.showWarningIfNotValidOption($td, text);
-        });
-      } else {
-        const text = $td[0].textContent.trim();
+  if (empty)
+    return;
+  setTimeout(() => {
+    if ($td.hasClass(VALUE_MULTI)) {
+      $td[0].textContent.split(",").forEach(text => {
+        text = text.trim();
         this.showWarningIfNotValidOption($td, text);
-      }
-    }, 100);
-  }
+      });
+    } else {
+      const text = $td[0].textContent.trim();
+      this.showWarningIfNotValidOption($td, text);
+    }
+  }, 100);
 }
 
 ListOfValuesValidator.prototype.onClickMulti = function($td, ed) {

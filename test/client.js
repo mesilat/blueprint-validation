@@ -28,6 +28,18 @@ Client.prototype.createDraftFromBlueprint = async function(spaceKey, title, blue
     }
   });
 }
-
+Client.prototype.validatePage = async function(pageId, templateKey) {
+  if (templateKey) {
+    return this.post(`/rest/blueprint-validation/1.0/data/validate/${pageId}?templateKey=${encodeURIComponent(templateKey)}`);
+  } else {
+    return this.post(`/rest/blueprint-validation/1.0/data/validate/${pageId}`);
+  }
+}
+Client.prototype.getPageData = async function(pageId) {
+  return this.get(`/rest/blueprint-validation/1.0/data/${pageId}`);
+}
+Client.prototype.queryData = async function(params) {
+  return this.post(`/rest/blueprint-validation/1.0/data`, params);
+}
 
 module.exports = Client;

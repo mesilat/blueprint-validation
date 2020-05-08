@@ -11,13 +11,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mesilat.vbp.Constants;
 import static com.mesilat.vbp.Constants.X_BLUEPRINT_VALIDATION;
-import com.mesilat.vbp.api.DataService;
 import com.mesilat.vbp.api.DataValidateEvent;
 import com.mesilat.vbp.api.ParseException;
 import com.mesilat.vbp.api.ParserService;
 import com.mesilat.vbp.api.TextConverterService;
 import com.mesilat.vbp.api.ValidationException;
-import com.mesilat.vbp.api.ValidationService;
+import com.mesilat.vbp.impl.DataServiceEx;
+import com.mesilat.vbp.impl.ValidationServiceEx;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
@@ -36,9 +36,9 @@ public class PageServletBase {
 
     protected final TextConverterService textConverterService;
     protected final ParserService parserService;
-    protected final ValidationService validationService;
+    protected final ValidationServiceEx validationService;
     protected final PageManager pageManager;
-    protected final DataService dataService;
+    protected final DataServiceEx dataService;
     protected final TransactionTemplate transactionTemplate;
     protected final ObjectMapper mapper = new ObjectMapper();
     protected final I18nResolver resolver;
@@ -52,7 +52,7 @@ public class PageServletBase {
 
         String data = parserService.parse(storageFormat, spaceKey);
         validationService.validate(templateKey, data);
-        eventPublisher.publish(new DataValidateEvent(data));
+        eventPublisher.publish(new DataValidateEvent(templateKey, spaceKey, data, null));
         resp.setHeader(X_BLUEPRINT_VALIDATION, "valid");
 
         Long pageId = doProcess(req, resp, chain);
@@ -88,7 +88,7 @@ public class PageServletBase {
 
         String data = parserService.parse(storageFormat, spaceKey);
         validationService.validate(templateKey, data);
-        eventPublisher.publish(new DataValidateEvent(data));
+        eventPublisher.publish(new DataValidateEvent(templateKey, spaceKey, data, page));
 
         chain.doFilter(req, resp);
 
@@ -111,21 +111,13 @@ public class PageServletBase {
             return;
         }
 
-        String json = null;
-        try {
-            json = mapper.writeValueAsString(data);
-        } catch (JsonProcessingException ex) {
-            LOGGER.error(String.format("Failed to serialize JSON for page: %d", page.getId()), ex);
-        }
-
-        String _json = json;
         transactionTemplate.execute(() -> {
             try {
                 validationService.runValidationTask(uuid, templateKey, data);
-                eventPublisher.publish(new DataValidateEvent(data));
-                dataService.createPageInfo(page, templateKey, true, null, _json);
+                eventPublisher.publish(new DataValidateEvent(templateKey, page.getSpaceKey(), data, page));
+                dataService.createPageInfo(page, templateKey, true, null, data);
             } catch (Throwable ex) {
-                dataService.createPageInfo(page, templateKey, false, ex.getMessage(), _json);
+                dataService.createPageInfo(page, templateKey, false, ex.getMessage(), data);
             }
             return null;
         });
@@ -179,9 +171,9 @@ public class PageServletBase {
     public PageServletBase(
         TextConverterService textConverterService,
         ParserService parserService,
-        ValidationService validationService,
+        ValidationServiceEx validationService,
         PageManager pageManager,
-        DataService dataService,
+        DataServiceEx dataService,
         TransactionTemplate transactionTemplate,
         I18nResolver resolver,
         EventPublisher eventPublisher

@@ -8,14 +8,6 @@ providedDependencies.set('jquery', {
     },
 });
 
-providedDependencies.set('lodash', {
-    dependency: 'com.atlassian.plugin.jslibs:underscore-1.4.4',
-    import: {
-        var: `require('atlassian/libs/underscore-1.4.4')`,
-        amd: 'atlassian/libs/underscore-1.4.4',
-    },
-});
-
 providedDependencies.set('tinymce', {
     dependency: 'confluence.web.resources:amd',
     import: {

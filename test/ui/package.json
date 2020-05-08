@@ -1,0 +1,9 @@
+{
+  "name": "ui-test",
+  "version": "0.1.0",
+  "description": "lueprint Validation UI tests",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  }
+}

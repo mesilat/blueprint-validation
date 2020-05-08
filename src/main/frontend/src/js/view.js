@@ -4,10 +4,12 @@ import { get } from "./api";
 import { trace, error, notifyError } from "./util";
 import NumberValidator from "./validators/number";
 import { VALIDATE_PREFIX } from "./constants";
+import initMacroReport from "./macro/report";
 
 const getValidators = async () => get(`/rest/blueprint-validation/1.0/validator?extensive=true`);
 const getValidationTask = async uuid => get(`/rest/blueprint-validation/1.0/validation/${uuid}`);
 
+// Load number validators
 async function loadValidators() {
   try {
     const validators = await getValidators();
@@ -18,7 +20,7 @@ async function loadValidators() {
           validatorsClasses[validator.code] = new NumberValidator(validator);
           break;
         default:
-          // TODO
+          // TODO?
       }
     });
     return validatorsClasses;
@@ -88,6 +90,13 @@ function updatePendingTasks(pendingTasks) {
   }
 }
 
+function checkForMacros() {
+  trace("view::checkForMacros");
+  $(".conf-macro.com-mesilat-vbp-report").each(function(){
+    initMacroReport($(this));
+  });
+}
+
 async function init() {
   trace("view::init()");
   try {
@@ -105,6 +114,7 @@ async function init() {
   }
 
   checkForPendingTasks();
+  checkForMacros();
 }
 
 export default () => AJS.toInit(() => init());

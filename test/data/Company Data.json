@@ -1,0 +1,14 @@
+{
+  "type" : "object",
+  "properties" : {
+    "title" : { "type": "string" },
+    "position" : { "type": "number" },
+    "value" : { "type": "number" },
+    "assets" : { "type": "number" },
+    "sales" : { "type": "number" },
+    "profits" : { "type": "number" },
+    "country" : { "type": "string" }
+  },
+  "required" : [ "title", "position", "value", "assets", "sales", "profits" ],
+  "additionalProperties" : false
+}

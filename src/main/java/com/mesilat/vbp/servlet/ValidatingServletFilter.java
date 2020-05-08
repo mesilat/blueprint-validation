@@ -10,13 +10,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import static com.mesilat.vbp.Constants.X_BLUEPRINT_VALIDATION;
 import static com.mesilat.vbp.Constants.X_BLUEPRINT_VALIDATION_TASK;
-import com.mesilat.vbp.api.DataService;
 import com.mesilat.vbp.api.DataValidateEvent;
 import com.mesilat.vbp.api.ParserService;
 import com.mesilat.vbp.api.Template;
 import com.mesilat.vbp.api.TemplateManager;
 import com.mesilat.vbp.api.TextConverterService;
-import com.mesilat.vbp.api.ValidationService;
+import com.mesilat.vbp.impl.DataServiceEx;
+import com.mesilat.vbp.impl.ValidationServiceEx;
 import static com.mesilat.vbp.servlet.PageServletBase.LOGGER;
 import java.io.IOException;
 import java.io.InputStream;
@@ -135,7 +135,7 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                     String storageFormat = getStorageFormat(obj);
                     String data = parserService.parse(storageFormat, spaceKey);
                     validationService.validate(templateKey, data);
-                    eventPublisher.publish(new DataValidateEvent(data));
+                    eventPublisher.publish(new DataValidateEvent(templateKey, spaceKey, data, null));
                     response.setHeader(X_BLUEPRINT_VALIDATION, "valid");
                     
                     Long pageId = super.doProcess(wrappedRequest, response, chain);
@@ -146,17 +146,13 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                     }
                     super.setPageProperty(page, templateKey);
                     transactionTemplate.execute(() -> {
-                        try {
-                            dataService.createPageInfo(
-                                page,
-                                templateKey,
-                                true,
-                                null,
-                                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(data)
-                            );
-                        } catch (JsonProcessingException ex) {
-                            LOGGER.warn("Failed to serialize JSON data", ex);
-                        }
+                        dataService.createPageInfo(
+                            page,
+                            templateKey,
+                            true,
+                            null,
+                            data
+                        );
                         return null;
                     });
                 } catch (Throwable ex) {
@@ -233,22 +229,13 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                     String storageFormat = getStorageFormat(obj);
                     String data = parserService.parse(storageFormat, page.getSpaceKey());
                     validationService.validate(templateKey, data);
-                    eventPublisher.publish(new DataValidateEvent(data));
+                    eventPublisher.publish(new DataValidateEvent(templateKey, page.getSpaceKey(), data, page));
                     response.setHeader(X_BLUEPRINT_VALIDATION, "valid");
                     
                     super.doProcess(wrappedRequest, response, chain);
 
                     transactionTemplate.execute(() -> {
-                        try {
-                            dataService.updatePageInfo(
-                                page,
-                                true,
-                                null,
-                                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(data)
-                            );
-                        } catch (JsonProcessingException ex) {
-                            LOGGER.warn("Failed to serialize JSON data", ex);
-                        }
+                        dataService.updatePageInfo(page, true, null, data);
                         return null;
                     });
                 } catch (Throwable ex) {
@@ -276,9 +263,9 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
         PageManager pageManager,
         TransactionTemplate transactionTemplate,
         TextConverterService textConverterService,
-        ValidationService validationService,
+        ValidationServiceEx validationService,
         ParserService parserService,
-        DataService dataService,
+        DataServiceEx dataService,
         I18nResolver resolver,
         EventPublisher eventPublisher,
         TemplateManager templateManager

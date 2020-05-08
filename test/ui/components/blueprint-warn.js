@@ -1,4 +1,4 @@
-const options = require('../.test.settings.js');
+const options = require('../../.test.settings.js');
 const { delay } = require('../util');
 
 module.exports = async (client, templateId) => {
@@ -32,7 +32,7 @@ module.exports = async (client, templateId) => {
 
   await page.waitForSelector('#content-title');
   await page.focus('#content-title');
-  await delay(500);
+  await delay(2000);
   await page.type('#content-title', title);
   await page.waitForSelector('#wysiwygTextarea_ifr');
 
