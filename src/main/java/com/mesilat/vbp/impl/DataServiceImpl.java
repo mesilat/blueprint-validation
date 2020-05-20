@@ -16,10 +16,6 @@ public class DataServiceImpl implements DataServiceEx {
     private final ActiveObjects ao;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public ObjectNode getPageInfo(Long pageId) {
-        PageInfo info = ao.get(PageInfo.class, pageId);
-        return info == null? null: PageInfo.toObjectNode(mapper, info);
-    }
     @Override
     public String getPageData(Long pageId) {
         PageInfo info = ao.get(PageInfo.class, pageId);
@@ -34,6 +30,11 @@ public class DataServiceImpl implements DataServiceEx {
     public String getPageValidationMessage(Long pageId) {
         PageInfo info = ao.get(PageInfo.class, pageId);
         return info == null? null: info.getValidationMessage();
+    }
+    @Override
+    public ObjectNode getPageInfo(Long pageId) {
+        PageInfo info = ao.get(PageInfo.class, pageId);
+        return info == null? null: PageInfo.toObjectNode(mapper, info);
     }
     @Override
     public PageInfo getPageInfo(Page page) {

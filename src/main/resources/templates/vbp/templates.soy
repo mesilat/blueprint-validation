@@ -4,6 +4,7 @@
 * Space template actions
 * @param templateKey
 * @param uploadEnabled
+* @param restApiPath
 */
 {template .spaceTemplateActions}
 <tr class="com-mesilat-vbp-template-actions">
@@ -27,7 +28,7 @@
         <p>
           <ul>
             <li>
-              <a class="com-mesilat-vbp-download-as-xml" href="{contextPath()}/rest/blueprint-validation/1.0/template/{$templateKey}/content">
+              <a class="com-mesilat-vbp-download-as-xml" href="{contextPath()}{$restApiPath}/template/{$templateKey}/content">
                 {getText('com.mesilat.vbp.template.download.content')}
               </a>
             </li>
@@ -38,7 +39,7 @@
               <label for="com-mesilat-vbp-template-upload-content">{getText('com.mesilat.vbp.template.upload.content')}</label>
             </li>
             <li>
-              <a class="com-mesilat-vbp-download-as-json" href="{contextPath()}/rest/blueprint-validation/1.0/template/{$templateKey}/schema">
+              <a class="com-mesilat-vbp-download-as-json" href="{contextPath()}{$restApiPath}/template/{$templateKey}/schema">
                 {getText('com.mesilat.vbp.template.download.schema')}
               </a>
             </li>
@@ -47,7 +48,7 @@
               <label for="com-mesilat-vbp-template-upload-schema">{getText('com.mesilat.vbp.template.upload.schema')}</label>
             </li>
             <li>
-              <a class="com-mesilat-vbp-download-as-json" href="{contextPath()}/rest/blueprint-validation/1.0/template/{$templateKey}/generate-schema">
+              <a class="com-mesilat-vbp-download-as-json" href="{contextPath()}{$restApiPath}/template/{$templateKey}/generate-schema">
                 {getText('com.mesilat.vbp.template.generate.schema')}
               </a>
             </li>

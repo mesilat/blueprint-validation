@@ -30,7 +30,10 @@ import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import static com.mesilat.vbp.Constants.PLUGIN_KEY;
+import static com.mesilat.vbp.Constants.REST_API_PATH;
 import com.mesilat.vbp.PageInfo;
+import com.mesilat.vbp.api.DataDeleteEvent;
+import com.mesilat.vbp.api.DataUpdateEvent;
 import com.mesilat.vbp.api.DataValidateEvent;
 import com.mesilat.vbp.api.PathService;
 import com.mesilat.vbp.api.TemplateManager;
@@ -198,7 +201,7 @@ public class PathServiceImpl implements PathService, InitializingBean, Disposabl
         validation.add("template", template);
         validation.addProperty("valid", info.isValid());
         validation.addProperty("message", info.getValidationMessage());
-        validation.addProperty("href", String.format("%s/rest/blueprint-validation/1.0/data/%d", baseUrl, info.getPageId()));
+        validation.addProperty("href", String.format("%s%s/data/%d", baseUrl, REST_API_PATH, info.getPageId()));
         result.add("validation", validation);
 
         if (val instanceof JsonPrimitive){
@@ -253,20 +256,24 @@ public class PathServiceImpl implements PathService, InitializingBean, Disposabl
     @EventListener
     public void pageRestoreEvent(PageRestoreEvent event) {
         PageInfo info = dataService.getPageInfo(event.getPage());
-        if (info == null) {
+        if (info == null)
             return;
-        }
+
         dataService.undeletePageInfo(event.getPage());
         resetCache(info.getTemplateKey(), event.getPage());
+        Thread t = new Thread(() -> eventPublisher.publish(new DataUpdateEvent(event.getPage(), info.getData(), info.getTemplateKey(), true)));
+        t.start();
     }
     @EventListener
     public void pageTrashedEvent(PageTrashedEvent event) {
         PageInfo info = dataService.getPageInfo(event.getPage());
-        if (info == null) {
+        if (info == null)
             return;
-        }
+
         dataService.deletePageInfo(event.getPage());
         resetCache(info.getTemplateKey(), event.getPage());
+        Thread t = new Thread(() -> eventPublisher.publish(new DataDeleteEvent(event.getPage(), info.getData(), info.getTemplateKey())));
+        t.start();
     }
     @EventListener
     public void pageRemoveEvent(PageRemoveEvent event) {
@@ -276,6 +283,8 @@ public class PathServiceImpl implements PathService, InitializingBean, Disposabl
         }
         dataService.deletePageInfo(event.getPage());
         resetCache(info.getTemplateKey(), event.getPage());
+        Thread t = new Thread(() -> eventPublisher.publish(new DataDeleteEvent(event.getPage(), info.getData(), info.getTemplateKey())));
+        t.start();
     }
     private void resetCache(String templateKey, Page page) {
         if (templateKey == null) {

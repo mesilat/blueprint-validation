@@ -2,13 +2,14 @@ import $ from "jquery";
 import _ from "lodash";
 import { showConfirmationDialog, notify, notifyError, notifySuccess, trace, error } from "../util";
 import { get, post, put, del, downloadFile } from "../api";
+import { REST_API_PATH } from "../constants";
 
-const listValidators = async () => get(`/rest/blueprint-validation/1.0/validator`);
-const getValidatorDetail = async code => get(`/rest/blueprint-validation/1.0/validator/${encodeURIComponent(code)}`);
-const createValidator = async data => post(`/rest/blueprint-validation/1.0/validator`, data);
-const updateValidator = async (code, data) => put(`/rest/blueprint-validation/1.0/validator/${encodeURIComponent(code)}`, data);
-const deleteValidator = async code => del(`/rest/blueprint-validation/1.0/validator/${encodeURIComponent(code)}`);
-const uploadValidators = async (data) => post(`/rest/blueprint-validation/1.0/validator/upload`, {}, { data });
+const listValidators = async () => get(`${REST_API_PATH}/validator`);
+const getValidatorDetail = async code => get(`${REST_API_PATH}/validator/${encodeURIComponent(code)}`);
+const createValidator = async data => post(`${REST_API_PATH}/validator`, data);
+const updateValidator = async (code, data) => put(`${REST_API_PATH}/validator/${encodeURIComponent(code)}`, data);
+const deleteValidator = async code => del(`${REST_API_PATH}/validator/${encodeURIComponent(code)}`);
+const uploadValidators = async (data) => post(`${REST_API_PATH}/validator/upload`, {}, { data });
 
 function validate($form) {
   const data = {};

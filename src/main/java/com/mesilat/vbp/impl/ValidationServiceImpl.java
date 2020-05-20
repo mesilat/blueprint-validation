@@ -1,6 +1,7 @@
 package com.mesilat.vbp.impl;
 
 import com.atlassian.confluence.pages.Page;
+import com.atlassian.event.api.EventPublisher;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.message.I18nResolver;
@@ -12,6 +13,7 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
+import com.mesilat.vbp.api.DataUpdateEvent;
 import com.mesilat.vbp.api.ParseException;
 import com.mesilat.vbp.api.ParserService;
 import com.mesilat.vbp.api.Template;
@@ -46,6 +48,8 @@ public class ValidationServiceImpl implements ValidationServiceEx, InitializingB
     private final I18nResolver resolver;
     @ComponentImport
     private final TransactionTemplate transactionTemplate;
+    @ComponentImport
+    private final EventPublisher eventPublisher;
     private final ObjectMapper mapper = new ObjectMapper();
 
     private final Map<String,ValidationTask> tasks = new HashMap<>();
@@ -131,6 +135,7 @@ public class ValidationServiceImpl implements ValidationServiceEx, InitializingB
                 return null;
             });
         }
+        eventPublisher.publish(new DataUpdateEvent(page, data, templateKey, false));
     }
 
     @Override
@@ -174,7 +179,8 @@ public class ValidationServiceImpl implements ValidationServiceEx, InitializingB
     @Inject
     public ValidationServiceImpl(
         TransactionTemplate transactionTemplate, TemplateManager templateManager,
-        ParserService parserService, I18nResolver resolver, DataServiceEx dataService
+        ParserService parserService, I18nResolver resolver, DataServiceEx dataService,
+        EventPublisher eventPublisher
     ) {
         this.templateManager = templateManager;
         this.parserService = parserService;
@@ -184,6 +190,7 @@ public class ValidationServiceImpl implements ValidationServiceEx, InitializingB
             return JsonSchemaFactory.byDefault();
         });
         this.dataService = dataService;
+        this.eventPublisher = eventPublisher;
     }
 
     @XmlRootElement

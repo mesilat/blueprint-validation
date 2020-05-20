@@ -3,11 +3,11 @@ import _ from "lodash";
 import { get } from "./api";
 import { trace, error, notifyError } from "./util";
 import NumberValidator from "./validators/number";
-import { VALIDATE_PREFIX } from "./constants";
+import { VALIDATE_PREFIX, REST_API_PATH } from "./constants";
 import initMacroReport from "./macro/report";
 
-const getValidators = async () => get(`/rest/blueprint-validation/1.0/validator?extensive=true`);
-const getValidationTask = async uuid => get(`/rest/blueprint-validation/1.0/validation/${uuid}`);
+const getValidators = async () => get(`${REST_API_PATH}/validator?extensive=true`);
+const getValidationTask = async uuid => get(`${REST_API_PATH}/validation/${uuid}`);
 
 // Load number validators
 async function loadValidators() {

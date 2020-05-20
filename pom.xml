@@ -7,15 +7,18 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.mesilat</groupId>
   <artifactId>blueprint-validation</artifactId>
-  <version>0.1.0.99</version>
+  <version>0.1.2.4</version>
 
   <organization>
     <name>Mesilat Limited</name>
-    <url>https://www.mesilat.com/pages/confluence/blueprint-validation/</url>
+    <url>http://www.mesilat.com/bvp/</url>
   </organization>
 
-  <name>Blueprint Validation for Confluence</name>
-  <description>Blueprint validation plugin for Atlassian Confluence</description>
+  <name>Blueprint Validation</name>
+  <description>
+    Blueprint validation plugin for Atlassian Confluence provides for converting
+    Confluence storage format to JSON and validating it against JSON schema
+  </description>
   <packaging>atlassian-plugin</packaging>
 
   <dependencies>
@@ -94,7 +97,7 @@
     <dependency>
       <groupId>me.bvn</groupId>
       <artifactId>page-parser</artifactId>
-      <version>0.1.0</version>
+      <version>0.1.1</version>
     </dependency>
 
     <dependency>
@@ -261,7 +264,7 @@
   </profiles>
 
   <properties>
-    <confluence.version>6.14.0</confluence.version>
+    <confluence.version>7.1.0</confluence.version>
     <confluence.data.version>6.14.0</confluence.data.version>
     <amps.version>8.0.2</amps.version>
     <ao.version>1.1.5</ao.version>

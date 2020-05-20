@@ -101,14 +101,14 @@ public class PageServletBase {
             return null;
         });
     }
-    protected void postValidate(String uuid, Page page, String templateKey) {
+    protected String postValidate(String uuid, Page page, String templateKey) {
         String storageFormat = page.getBodyContent().getBody();
         String data;
         try {
             data = parserService.parse(storageFormat, page.getSpaceKey());
         } catch (ParseException ex) {
             LOGGER.error(String.format("Failed to parse page: %d", page.getId()), ex);
-            return;
+            return null;
         }
 
         transactionTemplate.execute(() -> {
@@ -121,6 +121,8 @@ public class PageServletBase {
             }
             return null;
         });
+
+        return data;
     }
     protected Long doProcess(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
         HttpServletResponse response = (HttpServletResponse)resp;

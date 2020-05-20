@@ -83,7 +83,7 @@
     <url-pattern>/rest/api/content/blueprint/instance/*</url-pattern>
   </servlet-filter>
 
-  <rest key="rest" path="/blueprint-validation" version="1.0" />
+  <rest key="rest" path="/data-share" version="1.0" />
 
   <web-item key="admin.blueprint-validation" i18n-name-key="com.mesilat.vbp.global.link" section="system.admin/administration" weight="100" application="confluence">
       <label key="com.mesilat.vbp.global.link"/>

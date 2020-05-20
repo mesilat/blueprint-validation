@@ -1,6 +1,7 @@
 import $ from "jquery";
 import { notifyError, notifySuccess, trace, flash } from "../util";
 import { get, post, put, putXml, downloadFile } from "../api";
+import { REST_API_PATH } from "../constants";
 
 let VALIDATION_MODES; // import available validation modes in user locale
 window.require("confluence/module-exporter")
@@ -8,10 +9,10 @@ window.require("confluence/module-exporter")
   VALIDATION_MODES = provider.getValidationModes();
 });
 
-const getTemplateSetting = async templateKey => get(`/rest/blueprint-validation/1.0/template/${templateKey}`);
-const setValidationMode = async data => post("/rest/blueprint-validation/1.0/template", data);
-const uploadTemplateContent = async (templateKey, data) => putXml(`/rest/blueprint-validation/1.0/template/${templateKey}/content`, data);
-const uploadTemplateSchema = async (templateKey, data) => put(`/rest/blueprint-validation/1.0/template/${templateKey}/schema`, {}, { data });
+const getTemplateSetting = async templateKey => get(`${REST_API_PATH}/template/${templateKey}`);
+const setValidationMode = async data => post(`${REST_API_PATH}/template`, data);
+const uploadTemplateContent = async (templateKey, data) => putXml(`${REST_API_PATH}/template/${templateKey}/content`, data);
+const uploadTemplateSchema = async (templateKey, data) => put(`${REST_API_PATH}/template/${templateKey}/schema`, {}, { data });
 
 async function updateValidationMode(templateKey, validationMode, $tr) {
   try {
@@ -82,7 +83,7 @@ export default function initTemplatesTable($table){
     }
 
     // Show actions pane
-    const $actions = $(Mesilat.BlueprintValidation.spaceTemplateActions({ templateKey, uploadEnabled }));
+    const $actions = $(Mesilat.BlueprintValidation.spaceTemplateActions({ templateKey, uploadEnabled, restApiPath: REST_API_PATH }));
     $actions.find(`aui-option[value="${settings.validationMode}"]`).attr("selected", true);
     $actions.find("aui-select").on("change", async (e) => {
       const validationMode = $(e.target).val();

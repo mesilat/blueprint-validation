@@ -91,7 +91,7 @@
     <div class="buttons">
       <a id="com-mesilat-vbp-templates-export" class="aui-button aui-button-link"
         title="$action.getText('com.mesilat.vbp.config.validators.export')"
-        href="$req.contextPath/rest/blueprint-validation/1.0/validator?extensive=true">$action.getText("com.mesilat.general.export")</a>
+        href="$pluginEndpoint/validator?extensive=true">$action.getText("com.mesilat.general.export")</a>
       <span class="aui-button aui-button-link com-mesilat-vbp-file-upload-wrapper">
         <input type="file" id="com-mesilat-vbp-templates-import" name="vbp-templates-import"/>
         <label for="com-mesilat-vbp-templates-import" title="$action.getText('com.mesilat.vbp.config.validators.import')">

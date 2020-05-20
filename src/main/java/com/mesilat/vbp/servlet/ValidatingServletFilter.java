@@ -6,10 +6,11 @@ import com.atlassian.event.api.EventPublisher;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import static com.mesilat.vbp.Constants.X_BLUEPRINT_VALIDATION;
 import static com.mesilat.vbp.Constants.X_BLUEPRINT_VALIDATION_TASK;
+import com.mesilat.vbp.api.DataCreateEvent;
+import com.mesilat.vbp.api.DataUpdateEvent;
 import com.mesilat.vbp.api.DataValidateEvent;
 import com.mesilat.vbp.api.ParserService;
 import com.mesilat.vbp.api.Template;
@@ -120,7 +121,12 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                     }
                     super.setPageProperty(page, templateKey);
                     validationService.registerValidationTask(uuid, page.getId(), page.getTitle());
-                    Thread t = new Thread(() -> super.postValidate(uuid, page, templateKey));
+                    Thread t = new Thread(() -> {
+                        String data = postValidate(uuid, page, templateKey);
+                        if (data == null)
+                            return;
+                        eventPublisher.publish(new DataCreateEvent(page, data, templateKey));
+                    });
                     t.start();
                 }
                 break;
@@ -155,6 +161,8 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                         );
                         return null;
                     });
+                    Thread t = new Thread(() -> eventPublisher.publish(new DataCreateEvent(page, data, templateKey)));
+                    t.start();
                 } catch (Throwable ex) {
                     sendError(response, ex);
                 }
@@ -178,6 +186,7 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
             return;
         }
 
+        String oldPageTitle = page.getTitle();
         String templateKey = page.getProperties().getStringProperty(PROPERTY_TEMPLATE);
         if (templateKey == null) {
             if (templateInfo != null) {
@@ -214,7 +223,10 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
 
                     super.doProcess(request, response, chain);
                     validationService.registerValidationTask(uuid, page.getId(), page.getTitle());
-                    Thread t = new Thread(() -> super.postValidate(uuid, page, templateKey));
+                    Thread t = new Thread(() -> {
+                        String data = postValidate(uuid, page, templateKey);
+                        eventPublisher.publish(new DataUpdateEvent(page, data, templateKey, !oldPageTitle.equals(page.getTitle())));
+                    });
                     t.start();
                 }
                 break;
@@ -225,7 +237,6 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                     try (InputStream in = wrappedRequest.getInputStream()){
                         obj = (ObjectNode)mapper.readTree(in);
                     }
-                    
                     String storageFormat = getStorageFormat(obj);
                     String data = parserService.parse(storageFormat, page.getSpaceKey());
                     validationService.validate(templateKey, data);
@@ -238,6 +249,9 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                         dataService.updatePageInfo(page, true, null, data);
                         return null;
                     });
+
+                    Thread t = new Thread(() -> eventPublisher.publish(new DataUpdateEvent(page, data, templateKey, !oldPageTitle.equals(page.getTitle()))));
+                    t.start();
                 } catch (Throwable ex) {
                     sendError(response, ex);
                 }

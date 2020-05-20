@@ -8,6 +8,7 @@ import com.atlassian.confluence.plugins.createcontent.extensions.ContentTemplate
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import static com.mesilat.vbp.Constants.REST_API_PATH;
 import com.mesilat.vbp.api.Template;
 import com.mesilat.vbp.api.TemplateManager;
 import com.mesilat.vbp.api.ValidatorManager;
@@ -39,6 +40,9 @@ public class GlobalConfigAction extends ConfluenceActionSupport {
     }
     public String getCssClass() {
         return cssClass;
+    }
+    public String getPluginEndpoint() {
+        return String.format("%s%s", this.getCurrentRequest().getContextPath(), REST_API_PATH);
     }
     
     @Override

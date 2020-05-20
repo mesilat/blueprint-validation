@@ -96,7 +96,7 @@ describe('Validating Blueprints API tests', () => {
     expect(pages.length).toBe(1);
     const page = pages[0];
 
-    // Test fot GET /rest/blueprint-validation/1.0/data/${pageId}
+    // Test fot GET ${REST_API_PATH}/data/${pageId}
     data = await client.getPageData(page.id);
     // console.debug(data);
     expect(data.page.title).toBe('Sinopec');
@@ -106,7 +106,7 @@ describe('Validating Blueprints API tests', () => {
     expect(data.data.position).toBe(88);
     expect(data.data.country).toBe('China');
 
-    // Test for POST /rest/blueprint-validation/1.0/data
+    // Test for POST ${REST_API_PATH}/data
     data = await client.queryData({
       pageId: page.id,
       path: 'country'

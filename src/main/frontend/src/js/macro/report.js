@@ -1,8 +1,9 @@
 import $ from "jquery";
 import { trace, error } from "../util";
 import { post } from "../api";
+import { REST_API_PATH } from "../constants";
 
-const getData = async params => post(`/rest/blueprint-validation/1.0/data`, params);
+const getData = async params => post(`${REST_API_PATH}/data`, params);
 
 // POST --data '{"templateKey":"4784144","path":"[?(@.sales>200)]"}' "${TEST_WIKI_HOME}"
 

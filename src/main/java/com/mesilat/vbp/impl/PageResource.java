@@ -37,7 +37,7 @@ public class PageResource {
         DefaultSaveContext sc = new DefaultSaveContext(true/*suppressNotifications*/, true/*updateLastModifier*/, suppressEvents);
         pageManager.saveNewVersion(page, (Page p) -> {
             p.setBodyAsString(body);
-            LOGGER.warn(String.format("New version of page %d was created", pageId));
+            LOGGER.warn(String.format("Created new version of page %d", pageId));
         }, sc);
 
         return Response.status(Response.Status.ACCEPTED).build();

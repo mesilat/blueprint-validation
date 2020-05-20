@@ -7,7 +7,7 @@ import { checkLocation } from "./navigation/nav";
 import installTableHook from "./edit/table";
 import installAjaxSpy from "./edit/ajaxspy";
 import installOnSaveHook from "./edit/onsave";
-import { X_VBP_TEMPLATE } from "./constants";
+import { X_VBP_TEMPLATE, REST_API_PATH } from "./constants";
 
 function init(){
 
@@ -32,7 +32,7 @@ function init(){
   const ed = AJS.Rte.getEditor();
 
   // Install CSS for prompts and warnings
-  const $link = $(`<link rel="stylesheet" type="text/css" href="${AJS.contextPath()}/rest/blueprint-validation/1.0/validator/css">`,
+  const $link = $(`<link rel="stylesheet" type="text/css" href="${AJS.contextPath()}${REST_API_PATH}/validator/css">`,
     ed.contentDocument);
   $link.appendTo($(ed.contentDocument.head));
 

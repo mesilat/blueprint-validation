@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 async function convertContentToStorageFormat(html) {
   return $.ajax({
-    url: `${AJS.contextPath()}/rest/blueprint-validation/1.0/converter/to-storage-format`,
+    url: `${AJS.contextPath()}${REST_API_PATH}/converter/to-storage-format`,
     type: 'POST',
     data: html,
     dataType: 'text',
@@ -46,7 +46,7 @@ public class TextConverterResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         }
     }
-    
+
     @Inject
     public TextConverterResource(TextConverterService converter) {
         this.converter = converter;

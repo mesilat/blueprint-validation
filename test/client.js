@@ -1,4 +1,5 @@
 const ConfluenceClient = require('confluence-client');
+const REST_API_PATH = "/rest/data-share/1.0";
 
 function Client(options) {
     ConfluenceClient.apply(this, [options]);
@@ -6,7 +7,7 @@ function Client(options) {
 Client.prototype = Object.create(ConfluenceClient.prototype);
 Client.prototype.constructor = Client;
 Client.prototype.setTemplateValidationMode = async function(data /*{templateKey, templateName, validationMode}*/) {
-  return this.post(`/rest/blueprint-validation/1.0/template`, data);
+  return this.post(`${REST_API_PATH}/template`, data);
 }
 Client.prototype.listSpaceTemplates = async function(spaceKey) {
   return this.get(`/rest/experimental/template/page`, { spaceKey });
@@ -30,16 +31,16 @@ Client.prototype.createDraftFromBlueprint = async function(spaceKey, title, blue
 }
 Client.prototype.validatePage = async function(pageId, templateKey) {
   if (templateKey) {
-    return this.post(`/rest/blueprint-validation/1.0/data/validate/${pageId}?templateKey=${encodeURIComponent(templateKey)}`);
+    return this.post(`${REST_API_PATH}/data/validate/${pageId}?templateKey=${encodeURIComponent(templateKey)}`);
   } else {
-    return this.post(`/rest/blueprint-validation/1.0/data/validate/${pageId}`);
+    return this.post(`${REST_API_PATH}/data/validate/${pageId}`);
   }
 }
 Client.prototype.getPageData = async function(pageId) {
-  return this.get(`/rest/blueprint-validation/1.0/data/${pageId}`);
+  return this.get(`${REST_API_PATH}/data/${pageId}`);
 }
 Client.prototype.queryData = async function(params) {
-  return this.post(`/rest/blueprint-validation/1.0/data`, params);
+  return this.post(`${REST_API_PATH}/data`, params);
 }
 
 module.exports = Client;

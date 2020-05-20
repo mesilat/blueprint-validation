@@ -1,8 +1,8 @@
 import { trace } from "../util";
 import { get } from "../api";
-import { X_VBP_TEMPLATE } from "../constants";
+import { X_VBP_TEMPLATE, REST_API_PATH } from "../constants";
 
-const getTemplateSetting = async templateKey => get(`/rest/blueprint-validation/1.0/template/${templateKey}`);
+const getTemplateSetting = async templateKey => get(`${REST_API_PATH}/template/${templateKey}`);
 const getBlueprintInfo = async contentBlueprintId => get(`/rest/create-dialog/1.0/blueprints/get/${contentBlueprintId}`);
 
 export async function checkResponse(response, request) {

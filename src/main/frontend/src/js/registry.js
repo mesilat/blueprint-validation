@@ -1,5 +1,5 @@
 import $ from "jquery";
-import { SHOW_PROMPT, SHOW_WARNING, VALIDATE_PREFIX } from "./constants";
+import { SHOW_PROMPT, SHOW_WARNING, VALIDATE_PREFIX, REST_API_PATH } from "./constants";
 import { get } from "./api";
 import { trace, error } from "./util";
 
@@ -10,7 +10,7 @@ import PageValidator from "./validators/page";
 import UserValidator from "./validators/user";
 import DateValidator from "./validators/date";
 
-const getValidators = async () => get(`/rest/blueprint-validation/1.0/validator?extensive=true`);
+const getValidators = async () => get(`${REST_API_PATH}/validator?extensive=true`);
 
 function isEmpty($td){
   if ($td.text().replace(/\s/g, "") !== ""){

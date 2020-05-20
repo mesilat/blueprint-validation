@@ -58,17 +58,17 @@ public class DataResource {
 
     /**
      * Return page validation info and JSON data.
-     * 
+     *
      * Using with curl:
      * curl -v -H "X-Atlassian-Token: no-check" \
      * -u "${WIKI_USER}:${WIKI_PASSWORD}" \
-     * "${WIKI_HOME}/rest/blueprint-validation/1.0/data/${pageId}"
-     * 
+     * "${WIKI_HOME}${REST_API_PATH}/data/${pageId}"
+     *
      * @param pageId
      * @param path JSON path to extract
      * @return JSON object
      * @throws JsonProcessingException
-     * @throws IOException 
+     * @throws IOException
      */
     @GET
     @Path("/{id}")

@@ -13,9 +13,16 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.message.I18nResolver;
+import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.fge.jackson.JsonLoader;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.main.JsonSchemaFactory;
+import com.github.fge.jsonschema.main.JsonValidator;
 import static com.google.common.net.HttpHeaders.CACHE_CONTROL;
 import static com.google.common.net.HttpHeaders.CONTENT_DISPOSITION;
 import static com.google.common.net.HttpHeaders.EXPIRES;
@@ -70,6 +77,7 @@ public class TemplateResource extends ResourceBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(Constants.PLUGIN_KEY);
     private static final Logger EXTRA_TRACE = LoggerFactory.getLogger("extratrace");
 
+    private final JsonSchemaFactory factory;
     @ComponentImport
     private final PluginAccessor pluginAccessor;
     @ComponentImport
@@ -237,13 +245,23 @@ public class TemplateResource extends ResourceBase {
     @Path("/{key}/schema")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response putSchema(@PathParam("key") String templateKey, String schema) {
+    public Response putSchema(@PathParam("key") String templateKey, String schema) throws IOException, ProcessingException {
         Response response = checkUserCanAdministerTemplate(templateKey);
         if (response != null) {
             return response;
         }
 
         LOGGER.trace(String.format("Upload JSON schema for template %s", templateKey));
+
+        JsonValidator validator = factory.getValidator();
+        JsonNode draftv4 = JsonLoader.fromResource("/draftv4/schema");
+        ProcessingReport report = validator.validate(draftv4, JsonLoader.fromString(schema));
+        if (!report.isSuccess()) {
+            StringBuilder sb = new StringBuilder();
+            report.forEach(msg -> sb.append(msg.getMessage()).append("\n"));
+            throw new ProcessingException(sb.toString());
+        }
+        
         service.setSchema(templateKey, schema);
         return Response.status(Status.ACCEPTED).build();
     }
@@ -354,13 +372,17 @@ public class TemplateResource extends ResourceBase {
     public TemplateResource(PluginAccessor pluginAccessor, XmlEventReaderFactory xmlEventReaderFactory,
             I18nResolver resolver, TemplateManager service,
             PageTemplateManager pageTemplateManager, @ComponentImport PermissionManager permissionManager,
-            @ComponentImport SpacePermissionManager spacePermissionManager
+            @ComponentImport SpacePermissionManager spacePermissionManager,
+            @ComponentImport TransactionTemplate transactionTemplate
     ) {
         super(permissionManager, resolver, pageTemplateManager, spacePermissionManager);
         this.pluginAccessor = pluginAccessor;
         this.xmlEventReaderFactory = xmlEventReaderFactory;
         this.service = service;
         this.pageTemplateManager = pageTemplateManager;
+        this.factory = transactionTemplate.execute(() -> {
+            return JsonSchemaFactory.byDefault();
+        });
     }
 
     @XmlRootElement(name = "response")

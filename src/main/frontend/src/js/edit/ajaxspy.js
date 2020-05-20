@@ -2,9 +2,10 @@ import $ from "jquery";
 import { X_VBP_TEMPLATE } from "../constants";
 import { trace, notifyError } from "../util";
 import { post } from "../api";
+import { REST_API_PATH } from "../constants";
 
 const INSTALLED = "bvn-ajax-hook-installed";
-const registerDraft = async draft => post(`/rest/blueprint-validation/1.0/draft`, draft);
+const registerDraft = async draft => post(`${REST_API_PATH}/draft`, draft);
 
 function init() {
   if ($(document).data(INSTALLED))
