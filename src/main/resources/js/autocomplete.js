@@ -109,7 +109,7 @@ function($,AJS,_,Confluence,tinymce,autocomplete,util){
     const re = /^_ALL\((.+)\)_$/;
 
     function createMatrixFromArray(arr, val){
-        var matrix = [];        
+        var matrix = [];
         if (arr.length <= 13){
             arr.forEach(function(text){
                 if (text !== ''){
@@ -174,8 +174,10 @@ function($,AJS,_,Confluence,tinymce,autocomplete,util){
             getDataAndRunCallback: function(autoCompleteControl,val,callback){
                 if (autoCompleteControl.settings.id === '_DATA_'){
                     var data = autoCompleteControl.settings.data;
-                    if (_.isArray(data)){
+                    if (Array.isArray(data)){
                         callback(createMatrixFromArray(data, val), val, function(){});
+                    } else if (typeof data === 'function') {
+                        callback(data(val), val, function(){});
                     } else {
                         util.getRestData(
                             autoCompleteControl,
@@ -206,7 +208,7 @@ function($,AJS,_,Confluence,tinymce,autocomplete,util){
                     }
                 } else {
                     $.ajax({
-                        url: AJS.contextPath() + '/rest/lov-resource/1.0/refdata/' + autoCompleteControl.settings.id,
+                        url: AJS.contextPath() + '/rest/data-share/1.0/refdata/' + autoCompleteControl.settings.id,
                         type: 'GET',
                         cache: false
                     }).done(function(data){
@@ -227,7 +229,7 @@ function($,AJS,_,Confluence,tinymce,autocomplete,util){
                     }).fail(function(jqxhr){
                         console.error('com.mesilat.lov-placeholder', jqxhr.responseText);
                     });
-                }                
+                }
             },
             update: function (autoCompleteControl, link){
                 function putText(className){
@@ -260,16 +262,25 @@ function($,AJS,_,Confluence,tinymce,autocomplete,util){
 
                             ed.execCommand('mceInsertContent', false, ', ');
                             ed.execCommand('mceInsertContent', false, $p.html());
-                        } 
+                        }
 
                     });
                 }
 
                 if (autoCompleteControl.settings.id === '_DATA_'){
                     var data = autoCompleteControl.settings.data;
-                    //console.log('MesilatAutocompleteSettings.update', link, data);
-
-                    if (_.isArray(data)){
+                    if (typeof data === 'function') {
+                      var linkObj = link;
+                      if (linkObj.restObj && linkObj.restObj.link) {
+                        const _link = AJS.$.extend(linkObj.restObj, {
+                          title: linkObj.restObj.linkAlias
+                        });
+                        linkObj = Confluence.Link.fromREST(_link);
+                        linkObj.insert();
+                      } else {
+                        putText(/*autoCompleteControl.settings.className*/);
+                      }
+                    } else if (Array.isArray(data)){
                         var _data = {};
                         data.forEach(function(e){
                             _data[e] = true;
@@ -380,14 +391,14 @@ require('confluence/module-exporter').safeRequire('com.mesilat/autocomplete-plug
                 .addClass('com-mesilat-autocomplete-panel-button')
                 .on('click', function(e){
                     $.ajax({
-                        url: AJS.contextPath() + '/rest/lov-resource/1.0/refdata',
+                        url: AJS.contextPath() + '/rest/data-share/1.0/refdata',
                         type: 'GET'
                     }).done(function(data){
                         var $dlg = $(Mesilat.Templates.Autocomplete.autocompleteDialog({
                             data: data,
                             code: code
                         }));
-                        
+
                         var $select = $dlg.find('select');
                         function filterOptions(text){
                             $select.empty();
@@ -426,7 +437,7 @@ require('confluence/module-exporter').safeRequire('com.mesilat/autocomplete-plug
                             filterOptions($filter.val());
                         });
                         $dlg.find('.aui-dialog2-footer-hint a').attr('href', AJS.contextPath() + '/plugins/lov-placeholder/settings.action');
-                        
+
                         AJS.dialog2($dlg).show();
                     }).fail(function(jqxhr){
                         console.error('com.mesilat.lov-placeholder', jqxhr.responseText);
@@ -436,7 +447,7 @@ require('confluence/module-exporter').safeRequire('com.mesilat/autocomplete-plug
                 if ($(elt).attr('data-placeholder-type').startsWith('com-mesilat-autocomplete-')){
                     $autocompleteButton.addClass('selected');
                     $.ajax({
-                        url: AJS.contextPath() + '/rest/lov-resource/1.0/refdata/' + code,
+                        url: AJS.contextPath() + '/rest/data-share/1.0/refdata/' + code,
                         type: 'GET'
                     }).done(function(data){
                         $autocompleteButton.attr('data-tooltip', data.name);

@@ -15,18 +15,17 @@ import com.mesilat.vbp.api.ValidatorManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.inject.Inject;
 
 @Scanned
 public class GlobalConfigAction extends ConfluenceActionSupport {
     private final static String[] VALIDATOR_TYPES = { "LOFV", "REXP", "NUMR", "USER", "PAGE", "DATE", "MODL" };
 
+    private TemplateManager templateManager;
+    private ValidatorManager validatorManager;
     @ComponentImport
-    private final ContentBlueprintManager contentBlueprintManager;
+    private ContentBlueprintManager contentBlueprintManager;
     @ComponentImport
-    private final PageTemplateManager pageTemplateManager;
-    private final TemplateManager templateManager;
-    private final ValidatorManager validatorManager;
+    private PageTemplateManager pageTemplateManager;
 
     private String title;
     private String message;
@@ -44,7 +43,32 @@ public class GlobalConfigAction extends ConfluenceActionSupport {
     public String getPluginEndpoint() {
         return String.format("%s%s", this.getCurrentRequest().getContextPath(), REST_API_PATH);
     }
-    
+
+    public TemplateManager getTemplateManager() {
+        return templateManager;
+    }
+    public void setTemplateManager(TemplateManager templateManager) {
+        this.templateManager = templateManager;
+    }
+    public ValidatorManager getValidatorManager() {
+        return validatorManager;
+    }
+    public void setValidatorManager(ValidatorManager validatorManager) {
+        this.validatorManager = validatorManager;
+    }
+    public ContentBlueprintManager getContentBlueprintManager() {
+        return contentBlueprintManager;
+    }
+    public void setContentBlueprintManager(ContentBlueprintManager contentBlueprintManager) {
+        this.contentBlueprintManager = contentBlueprintManager;
+    }
+    public PageTemplateManager getPageTemplateManager() {
+        return pageTemplateManager;
+    }
+    public void setPageTemplateManager(PageTemplateManager pageTemplateManager) {
+        this.pageTemplateManager = pageTemplateManager;
+    }
+
     @Override
     public String doDefault() {
         if (getPermissionManager().isSystemAdministrator(getAuthenticatedUser())) {
@@ -63,7 +87,7 @@ public class GlobalConfigAction extends ConfluenceActionSupport {
         contentBlueprintManager.getAll().forEach(blueprint -> {
             blueprint.getContentTemplateRefs().forEach(contentTemplateRef -> {
                 String key = contentTemplateRef.getModuleCompleteKey();
-                Template template = templateManager.get(key);
+                Template template = getTemplateManager().get(key);
                 ModuleDescriptor contentTemplateModuleDescriptor = pluginAccessor.getEnabledPluginModule(key);
                 TemplateWrapper templateWrapper;
                 if (contentTemplateModuleDescriptor instanceof ContentTemplateModuleDescriptor) {
@@ -80,10 +104,10 @@ public class GlobalConfigAction extends ConfluenceActionSupport {
                 templates.add(templateWrapper);
             });
         });
-        pageTemplateManager.getGlobalPageTemplates().forEach(t -> {
+        getPageTemplateManager().getGlobalPageTemplates().forEach(t -> {
             PageTemplate pageTemplate = (PageTemplate)t;
             String key = Long.toString(pageTemplate.getId());
-            Template template = templateManager.get(key);
+            Template template = getTemplateManager().get(key);
             TemplateWrapper templateWrapper = new TemplateWrapper(key, pageTemplate.getName(),
                 template == null? Template.ValidationMode.NONE: template.getValidationMode()
             );
@@ -96,7 +120,7 @@ public class GlobalConfigAction extends ConfluenceActionSupport {
         return templates;
     }
     public List getValidators() {
-        return validatorManager.list(false);        
+        return getValidatorManager().list(false);        
     }
     public List getValidatorTypes() {
         List<ValidatorType> validatorTypes = new ArrayList<>();
@@ -105,19 +129,6 @@ public class GlobalConfigAction extends ConfluenceActionSupport {
         ));
         return validatorTypes;
     }        
-
-    @Inject
-    public GlobalConfigAction(
-        ContentBlueprintManager contentBlueprintManager,
-        TemplateManager templateManager,
-        ValidatorManager validatorManager,
-        PageTemplateManager pageTemplateManager
-    ){
-        this.contentBlueprintManager = contentBlueprintManager;
-        this.templateManager = templateManager;
-        this.validatorManager = validatorManager;
-        this.pageTemplateManager = pageTemplateManager;
-    }
 
     public static class ValidatorType {
         private final String id;

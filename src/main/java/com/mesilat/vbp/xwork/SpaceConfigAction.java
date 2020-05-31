@@ -11,14 +11,26 @@ import com.mesilat.vbp.api.TemplateManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.inject.Inject;
 
 @Scanned
 public class SpaceConfigAction extends SpaceAdminAction {
     @ComponentImport
-    private final PageTemplateManager pageTemplateManager;
-    private final TemplateManager manager;
-    
+    private PageTemplateManager pageTemplateManager;
+    private TemplateManager manager;
+
+    public PageTemplateManager getPageTemplateManager() {
+        return pageTemplateManager;
+    }
+    public void setPageTemplateManager(PageTemplateManager pageTemplateManager) {
+        this.pageTemplateManager = pageTemplateManager;
+    }
+    public TemplateManager getManager() {
+        return manager;
+    }
+    public void setManager(TemplateManager manager) {
+        this.manager = manager;
+    }
+
     @Override
     public String doDefault() {
         return INPUT;
@@ -30,14 +42,14 @@ public class SpaceConfigAction extends SpaceAdminAction {
         if (space == null) {
             return Collections.EMPTY_LIST;
         }
-        List pageTemplates = pageTemplateManager.getPageTemplates(space);
+        List pageTemplates = getPageTemplateManager().getPageTemplates(space);
         List<TemplateWrapper> templates = new ArrayList<>();
         pageTemplates.forEach(pt -> {
             PageTemplate pageTemplate = (PageTemplate)pt;
             if (pageTemplate.getModuleKey() != null || pageTemplate.isGlobalPageTemplate()) {
                 return; // global templates are configured elsewhere
             }
-            Template template = manager.get(Long.toString(pageTemplate.getId()));
+            Template template = getManager().get(Long.toString(pageTemplate.getId()));
             TemplateWrapper templateWrapper = (template == null)?
                 new TemplateWrapper(Long.toString(pageTemplate.getId()), pageTemplate.getName(), Template.ValidationMode.NONE):
                 new TemplateWrapper(template, pageTemplate.getName());
@@ -48,11 +60,5 @@ public class SpaceConfigAction extends SpaceAdminAction {
         });
                 
         return templates;
-    }
-    
-    @Inject
-    public SpaceConfigAction(PageTemplateManager pageTemplateManager, TemplateManager manager) {
-        this.pageTemplateManager = pageTemplateManager;
-        this.manager = manager;
     }
 }

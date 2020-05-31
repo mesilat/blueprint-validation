@@ -11,7 +11,7 @@ public class DefaultUserResolver implements UserResolver {
     @Override
     public User getUserInfo(String userKey) {
         UserProfile user = userManager.getUserProfile(new UserKey(userKey));
-        return user == null? null: new User(userKey, user.getFullName());
+        return user == null? null: new User(userKey, user.getFullName(), user.getUsername());
     }
 
     public DefaultUserResolver(com.atlassian.sal.api.user.UserManager userManager) {

@@ -16,6 +16,7 @@ import com.mesilat.vbp.api.ParserService;
 import com.mesilat.vbp.api.Template;
 import com.mesilat.vbp.api.TemplateManager;
 import com.mesilat.vbp.api.TextConverterService;
+import com.mesilat.vbp.api.ValidationException;
 import com.mesilat.vbp.impl.DataServiceEx;
 import com.mesilat.vbp.impl.ValidationServiceEx;
 import static com.mesilat.vbp.servlet.PageServletBase.LOGGER;
@@ -54,13 +55,30 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
         HttpServletRequest request = (HttpServletRequest)req;
         HttpServletResponse response = (HttpServletResponse)resp;
 
+        if ("GET".equals(request.getMethod())) {
+            Matcher m = CONTENT_ID.matcher(request.getPathInfo());
+            if (m.matches()) {
+                try {
+                    long pageId = Long.parseLong(m.group(1));
+                    Page page = pageManager.getPage(pageId);
+                    if (page != null && page.getProperties().getStringProperty(PROPERTY_TEMPLATE) != null) {
+                        response.addHeader(X_VBP_TEMPLATE, page.getProperties().getStringProperty(PROPERTY_TEMPLATE));
+                    }
+                } catch(Throwable ignore) {}
+            }
+        }
+
         if (!("POST".equals(request.getMethod())) && !("PUT".equals(request.getMethod()))) {
             chain.doFilter(request, resp);
             return;
         }
-        
+
         String xTemplate = request.getHeader(X_VBP_TEMPLATE);
-        ObjectNode templateInfo = xTemplate == null? null: (ObjectNode)mapper.readTree(xTemplate);
+        ObjectNode templateInfo = null;
+        try {
+            if (xTemplate != null && xTemplate.charAt(0) == '{')
+                templateInfo = (ObjectNode)mapper.readTree(xTemplate);
+        } catch(Throwable ignore) {}
 
         Matcher m = CONTENT_ID.matcher(request.getPathInfo());
         if (m.matches()) {
@@ -140,8 +158,13 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                     
                     String storageFormat = getStorageFormat(obj);
                     String data = parserService.parse(storageFormat, spaceKey);
+
                     validationService.validate(templateKey, data);
-                    eventPublisher.publish(new DataValidateEvent(templateKey, spaceKey, data, null));
+                    DataValidateEvent event = new DataValidateEvent(templateKey, spaceKey, data, null);
+                    eventPublisher.publish(event);
+                    if (!event.isValid())
+                        throw new ValidationException(String.join("\n", event.getMessages()));
+
                     response.setHeader(X_BLUEPRINT_VALIDATION, "valid");
                     
                     Long pageId = super.doProcess(wrappedRequest, response, chain);
@@ -239,12 +262,15 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                     }
                     String storageFormat = getStorageFormat(obj);
                     String data = parserService.parse(storageFormat, page.getSpaceKey());
-                    validationService.validate(templateKey, data);
-                    eventPublisher.publish(new DataValidateEvent(templateKey, page.getSpaceKey(), data, page));
-                    response.setHeader(X_BLUEPRINT_VALIDATION, "valid");
-                    
-                    super.doProcess(wrappedRequest, response, chain);
 
+                    validationService.validate(templateKey, data);
+                    DataValidateEvent event = new DataValidateEvent(templateKey, page.getSpaceKey(), data, page);
+                    eventPublisher.publish(event);
+                    if (!event.isValid())
+                        throw new ValidationException(String.join("\n", event.getMessages()));
+
+                    response.setHeader(X_BLUEPRINT_VALIDATION, "valid");                    
+                    super.doProcess(wrappedRequest, response, chain);
                     transactionTemplate.execute(() -> {
                         dataService.updatePageInfo(page, true, null, data);
                         return null;

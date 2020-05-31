@@ -3,6 +3,8 @@ package com.mesilat.vbp.api;
 import com.atlassian.confluence.event.events.ConfluenceEvent;
 import com.atlassian.confluence.pages.Page;
 import com.mesilat.vbp.Constants;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +15,8 @@ public class DataValidateEvent extends ConfluenceEvent {
     private final String templateKey;
     private final String spaceKey;
     private final Page page;
+    private boolean valid = true;
+    private final List<String> messages = new ArrayList<>();
 
     public String getData() {
         return data;
@@ -25,6 +29,18 @@ public class DataValidateEvent extends ConfluenceEvent {
     }
     public Page getPage() {
         return page;
+    }
+    public boolean isValid() {
+        return valid;
+    }
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+    public List<String> getMessages() {
+        return messages;
+    }
+    public void addMessage(String message) {
+        this.messages.add(message);
     }
 
     public DataValidateEvent(String templateKey, String spaceKey, String data, Page page){

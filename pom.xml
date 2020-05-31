@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.mesilat</groupId>
   <artifactId>blueprint-validation</artifactId>
-  <version>0.1.2.4</version>
+  <version>1.1.2</version>
 
   <organization>
     <name>Mesilat Limited</name>
@@ -53,10 +53,6 @@
       <scope>provided</scope>
     </dependency>
 
-
-
-
-
     <dependency>
       <groupId>com.github.java-json-tools</groupId>
       <artifactId>json-schema-validator</artifactId>
@@ -93,13 +89,18 @@
       <artifactId>json-path</artifactId>
       <version>2.4.0</version>
     </dependency>
+    <dependency>
+      <groupId>com.atlassian.confluence.plugins</groupId>
+      <artifactId>confluence-highlight-actions-parent</artifactId>
+      <version>1.7.0</version>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>me.bvn</groupId>
       <artifactId>page-parser</artifactId>
-      <version>0.1.1</version>
+      <version>0.1.2</version>
     </dependency>
-
     <dependency>
       <groupId>com.mesilat</groupId>
       <artifactId>countries</artifactId>
@@ -141,6 +142,10 @@
             <pluginDependency>
               <groupId>com.mesilat</groupId>
               <artifactId>currencies</artifactId>
+            </pluginDependency>
+            <pluginDependency>
+              <groupId>com.atlassian.confluence.plugins</groupId>
+              <artifactId>confluence-highlight-actions</artifactId>
             </pluginDependency>
           </pluginDependencies>
 

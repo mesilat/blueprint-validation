@@ -1,5 +1,5 @@
 import $ from "jquery";
-import { OBJECTID_PREFIX, OBJECT_CLASS } from "../constants";
+import { OBJECTID_PREFIX, OBJECT_CLASS, X_VBP_TEMPLATE } from "../constants";
 import { generateUUID, trace, error } from "../util";
 import tinymce from "tinymce";
 
@@ -30,8 +30,28 @@ function fixDataObjectIds () {
   }
 }
 
+function repairMarkup() {
+  let templateKey = $(document).data(X_VBP_TEMPLATE);
+  if (!templateKey)
+    return;
+  try {
+    if ("templateKey" in templateKey)
+      templateKey = templateKey.templateKey;
+  } catch(ignore) {}
+  try {
+    const mod = window.require(templateKey);
+    if (mod && typeof mod.repairMarkup === "function") {
+      trace(`Repair markup for template ${templateKey}`);
+      mod.repairMarkup($("#wysiwygTextarea_ifr").contents());
+    }
+  } catch(ignore) {}
+}
+
 function init() {
-  Confluence.Editor.addSaveHandler(() => fixDataObjectIds());
+  Confluence.Editor.addSaveHandler(() => {
+    fixDataObjectIds();
+    repairMarkup();
+  });
 }
 
 export default () => init();

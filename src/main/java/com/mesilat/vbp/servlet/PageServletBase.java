@@ -114,7 +114,12 @@ public class PageServletBase {
         transactionTemplate.execute(() -> {
             try {
                 validationService.runValidationTask(uuid, templateKey, data);
-                eventPublisher.publish(new DataValidateEvent(templateKey, page.getSpaceKey(), data, page));
+
+                DataValidateEvent event = new DataValidateEvent(templateKey, page.getSpaceKey(), data, page);
+                eventPublisher.publish(event);
+                if (!event.isValid())
+                    throw new ValidationException(String.join("\n", event.getMessages()));
+
                 dataService.createPageInfo(page, templateKey, true, null, data);
             } catch (Throwable ex) {
                 dataService.createPageInfo(page, templateKey, false, ex.getMessage(), data);

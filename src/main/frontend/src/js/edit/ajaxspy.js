@@ -106,6 +106,12 @@ function init() {
           window.localStorage.vbpPendingTasks = JSON.stringify(pendingTasks);
         }
       }
+    } else if (
+      options.type === "GET" && options.url.indexOf(`/rest/api/content/${AJS.Meta.get("page-id")}?`) >= 0
+    ) {
+      const templateKey = xhr.getResponseHeader(X_VBP_TEMPLATE);
+      if (templateKey && !$(document).data(X_VBP_TEMPLATE))
+        $(document).data(X_VBP_TEMPLATE, templateKey);
     }
   });
 }
