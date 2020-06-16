@@ -2,6 +2,11 @@ import $ from "jquery";
 import { trace } from "./util";
 import { checkResponse } from "./navigation/blueprint";
 
+function onCreateDraft(responseJSON, data)  {
+  trace("general::onCreateDraft");
+  setTimeout(() => checkResponse(JSON.parse(responseJSON), JSON.parse(data)), 100);
+}
+
 async function init() {
   trace("general::init()");
 
@@ -13,7 +18,7 @@ async function init() {
         options.type === "POST"
       && options.url.indexOf("/rest/create-dialog/1.0/content-blueprint/create-draft") >= 0
     ) {
-      checkResponse(xhr.responseJSON, JSON.parse(options.data));
+      onCreateDraft(JSON.stringify(xhr.responseJSON), options.data);
     }
   });
 }

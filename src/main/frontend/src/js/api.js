@@ -1,9 +1,11 @@
 import $ from "jquery";
 import FileSaver from "file-saver";
+import { trace } from "./util";
 
 const DEFAULT_TIMEOUT = 30000;
 
 function toError(xhr) {
+  trace("api::toError", xhr.status, xhr.responseJSON, xhr.responseText);
   // http://localhost:8090/wiki/authenticate.action?destination=%2Fplugins%2Fservlet%2Fupm
   if (xhr.status === 401) {
     const destination = window.location.href.substr(window.location.href.indexOf(AJS.contextPath()) + AJS.contextPath().length);
@@ -27,7 +29,7 @@ export async function get(url, data, options) {
         type: 'GET',
         data,
         dataType: 'json',
-        timeout: DEFAULT_TIMEOUT
+        timeout: DEFAULT_TIMEOUT,
       }, options)
     ).then(data => resolve(data), xhr => reject(toError(xhr)));
   });

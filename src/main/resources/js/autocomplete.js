@@ -1,3 +1,5 @@
+const REST_API_PATH = "/rest/blueprint-validation/1.0";
+
 define('com.mesilat/autocomplete', [], function(){
     return {
         key: String.fromCharCode(1,2), // Make sure the code is unique
@@ -208,7 +210,7 @@ function($,AJS,_,Confluence,tinymce,autocomplete,util){
                     }
                 } else {
                     $.ajax({
-                        url: AJS.contextPath() + '/rest/data-share/1.0/refdata/' + autoCompleteControl.settings.id,
+                        url: AJS.contextPath() + REST_API_PATH + '/refdata/' + autoCompleteControl.settings.id,
                         type: 'GET',
                         cache: false
                     }).done(function(data){
@@ -391,7 +393,7 @@ require('confluence/module-exporter').safeRequire('com.mesilat/autocomplete-plug
                 .addClass('com-mesilat-autocomplete-panel-button')
                 .on('click', function(e){
                     $.ajax({
-                        url: AJS.contextPath() + '/rest/data-share/1.0/refdata',
+                        url: AJS.contextPath() + REST_API_PATH + '/refdata',
                         type: 'GET'
                     }).done(function(data){
                         var $dlg = $(Mesilat.Templates.Autocomplete.autocompleteDialog({
@@ -447,7 +449,7 @@ require('confluence/module-exporter').safeRequire('com.mesilat/autocomplete-plug
                 if ($(elt).attr('data-placeholder-type').startsWith('com-mesilat-autocomplete-')){
                     $autocompleteButton.addClass('selected');
                     $.ajax({
-                        url: AJS.contextPath() + '/rest/data-share/1.0/refdata/' + code,
+                        url: AJS.contextPath() + REST_API_PATH + '/refdata/' + code,
                         type: 'GET'
                     }).done(function(data){
                         $autocompleteButton.attr('data-tooltip', data.name);

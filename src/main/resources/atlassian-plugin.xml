@@ -83,8 +83,17 @@
     <url-pattern>/rest/api/content/blueprint/instance/*</url-pattern>
   </servlet-filter>
 
-  <rest key="rest" path="/data-share" version="1.0" />
+  <servlet-filter key="bvp-redirect-filter" class="com.mesilat.vbp.servlet.RedirectServletFilter" location="before-dispatch" weight="100">
+    <url-pattern>/rest/data-share/*</url-pattern>
+  </servlet-filter>
+  
+  <!--routing key="data-share-route" path="/rest/data-share/1.0">
+    <route from="/{tail}" to="/rest/blueprint-validation/1.0/{tail}"/>
+  </routing-->
 
+  <!--rest key="rest" path="/data-share" version="1.0" /-->
+  <rest key="rest" path="/blueprint-validation" version="1.0" />
+  
   <web-item key="admin.blueprint-validation" i18n-name-key="com.mesilat.vbp.global.link" section="system.admin/administration" weight="100" application="confluence">
       <label key="com.mesilat.vbp.global.link"/>
       <link>/plugins/blueprint-validation/global-config.action</link>

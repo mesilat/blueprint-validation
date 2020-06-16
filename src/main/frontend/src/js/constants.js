@@ -7,4 +7,5 @@ export const VBP_TRACE_ENABLED = "VBP_TRACE_ENABLED";
 export const X_VBP_TEMPLATE = "X-Blueprint-Validation-Template";
 export const OBJECTID_PREFIX = "dsobjid-";
 export const OBJECT_CLASS = "dsobject";
-export const REST_API_PATH = "/rest/data-share/1.0";
+// export const REST_API_PATH = "/rest/data-share/1.0";
+export const REST_API_PATH = "/rest/blueprint-validation/1.0";

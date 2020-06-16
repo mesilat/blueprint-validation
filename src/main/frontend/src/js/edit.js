@@ -1,5 +1,4 @@
 import $ from "jquery";
-import _ from "lodash";
 import MutationObserver from "mutation-observer";
 import registry from "./registry";
 import { notifyError, notifySuccess, trace } from "./util";
@@ -8,16 +7,42 @@ import installTableHook from "./edit/table";
 import installAjaxSpy from "./edit/ajaxspy";
 import installOnSaveHook from "./edit/onsave";
 import { X_VBP_TEMPLATE, REST_API_PATH } from "./constants";
+import { get } from "./api";
 
-function init(){
+const getTemplateSetting = async templateKey => get(`${REST_API_PATH}/template/${templateKey}`);
+const getBlueprintInfo = async id/* blueprint id */ => get(`${REST_API_PATH}/blueprint`, { id });
+
+async function init(){
 
   const query = new URLSearchParams(window.location.search);
   if (query.has("draftId") && window.localStorage[X_VBP_TEMPLATE]) {
-    const docTemplate = JSON.parse(window.localStorage[X_VBP_TEMPLATE]);
-    if (`${docTemplate.draftId}` === query.get("draftId")) {
-      $(document).data(X_VBP_TEMPLATE, docTemplate);
-      trace("edit::init restored X_VBP_TEMPLATE", docTemplate);
-    }
+    do {
+      const docTemplate = JSON.parse(window.localStorage[X_VBP_TEMPLATE]);
+      if (`${docTemplate.draftId}` === query.get("draftId")) {
+        if (!docTemplate.templateKey) {
+          if (!docTemplate.blueprintId)
+            break;
+
+          try {
+            const blueprint = await getBlueprintInfo(docTemplate.blueprintId);
+            if (blueprint && blueprint.contentTemplateRefs && blueprint.contentTemplateRefs.length > 0)
+              docTemplate.templateKey = blueprint.contentTemplateRefs[0].moduleCompleteKey;
+            else
+              break;
+          } catch (err) {
+            trace(`edit::init: getBlueprintInfo(${docTemplate.blueprintId}) failed`);
+            console.error(err);
+            break;;
+          }
+        }
+
+        const templateSettings = await getTemplateSetting(docTemplate.templateKey);
+        $.extend(docTemplate, templateSettings);
+
+        $(document).data(X_VBP_TEMPLATE, docTemplate);
+        trace("edit::init restored X_VBP_TEMPLATE", docTemplate);
+      }
+    } while (false);
 /*
   } else {
     setTimeout(() => {
@@ -79,7 +104,7 @@ function init(){
             $(node).find("td").each(function(){
               const $td = $(this);
               this.className.split(/\s+/).forEach((className) => {
-                if (className in registry.classes && _.isFunction(registry.classes[className].reset)){
+                if (className in registry.classes && typeof registry.classes[className].reset === "function"){
                   registry.classes[className].reset($td, registry.isEmpty($td), ed);
                 }
               });

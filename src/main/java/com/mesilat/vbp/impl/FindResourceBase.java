@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import static com.mesilat.vbp.Constants.PLUGIN_KEY;
+import static com.mesilat.vbp.Constants.REST_API_PATH;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,6 +38,7 @@ public class FindResourceBase {
                 .append("FROM \"").append(PAGE_INFO).append("\" D\n")
                 .append("JOIN \"content\" C ON D.\"PAGE_ID\" = C.CONTENTID\n")
                 .append("WHERE UPPER(C.TITLE) LIKE ?\n")
+                .append("AND C.CONTENT_STATUS = 'current'\n")
                 .append("ORDER BY TITLE\n")
                 .append("LIMIT ")
                 .append(limit)
@@ -47,6 +49,7 @@ public class FindResourceBase {
                 .append("FROM ").append(PAGE_INFO).append(" D\n")
                 .append("JOIN CONTENT C ON D.PAGE_ID = C.CONTENTID\n")
                 .append("WHERE UPPER(C.TITLE) LIKE ?\n")
+                .append("AND C.CONTENT_STATUS = 'current'\n")
                 .append("ORDER BY TITLE\n")
                 .append("LIMIT ")
                 .append(limit)
@@ -65,7 +68,7 @@ public class FindResourceBase {
                     Long id = rs.getLong("CONTENTID");
                     obj.put("id", id);
                     obj.put("title", rs.getString("TITLE"));
-                    obj.put("href", String.format("%s/rest/data-share/1.0/page/%d", baseUrl, id));
+                    obj.put("href", String.format("%s%s/page/%d", baseUrl, REST_API_PATH, id));
                     obj.put("view", String.format("%s/pages/viewpage.action?pageId=%d", baseUrl, id));
                     obj.set("data", mapper.readTree(rs.getString("DATA")));
                     arr.add(obj);
@@ -91,6 +94,7 @@ public class FindResourceBase {
                 .append(String.join(",", labels.stream().map(label -> String.format("'%s'", label)).collect(Collectors.toList())))
                 .append(")")
                 .append("AND UPPER(C.TITLE) LIKE ?\n")
+                .append("AND C.CONTENT_STATUS = 'current'\n")
                 .append("ORDER BY TITLE\n")
                 .append("LIMIT ")
                 .append(limit)
@@ -106,6 +110,7 @@ public class FindResourceBase {
                 .append(String.join(",", labels.stream().map(label -> String.format("'%s'", label)).collect(Collectors.toList())))
                 .append(")")
                 .append("AND UPPER(C.TITLE) LIKE ?\n")
+                .append("AND C.CONTENT_STATUS = 'current'\n")
                 .append("ORDER BY TITLE\n")
                 .append("LIMIT ")
                 .append(limit)
@@ -124,7 +129,7 @@ public class FindResourceBase {
                     Long id = rs.getLong("CONTENTID");
                     obj.put("id", id);
                     obj.put("title", rs.getString("TITLE"));
-                    obj.put("href", String.format("%s/rest/data-share/1.0/page/%d", baseUrl, id));
+                    obj.put("href", String.format("%s%s/page/%d", baseUrl, REST_API_PATH, id));
                     obj.put("view", String.format("%s/pages/viewpage.action?pageId=%d", baseUrl, id));
                     obj.set("data", mapper.readTree(rs.getString("DATA")));
                     arr.add(obj);
@@ -150,6 +155,7 @@ public class FindResourceBase {
                 .append(String.join(",", labels.stream().map(label -> String.format("'%s'", label)).collect(Collectors.toList())))
                 .append(")")
                 .append("AND UPPER(D.\"DATA\") LIKE ?\n")
+                .append("AND C.CONTENT_STATUS = 'current'\n")
                 .append("UNION\n")
                 .append("SELECT C.CONTENTID, C.TITLE, D.\"DATA\"\n")
                 .append("FROM \"").append(PAGE_INFO).append("\" D\n")
@@ -160,6 +166,7 @@ public class FindResourceBase {
                 .append(String.join(",", labels.stream().map(label -> String.format("'%s'", label)).collect(Collectors.toList())))
                 .append(")")
                 .append("AND UPPER(C.TITLE) LIKE ?\n")
+                .append("AND C.CONTENT_STATUS = 'current'\n")
                 .append("ORDER BY TITLE\n")
                 .append("LIMIT ")
                 .append(limit)
@@ -175,6 +182,7 @@ public class FindResourceBase {
                 .append(String.join(",", labels.stream().map(label -> String.format("'%s'", label)).collect(Collectors.toList())))
                 .append(")")
                 .append("AND UPPER(D.DATA) LIKE ?\n")
+                .append("AND C.CONTENT_STATUS = 'current'\n")
                 .append("UNION\n")
                 .append("SELECT C.CONTENTID, C.TITLE, D.DATA\n")
                 .append("FROM ").append(PAGE_INFO).append(" D\n")
@@ -185,6 +193,7 @@ public class FindResourceBase {
                 .append(String.join(",", labels.stream().map(label -> String.format("'%s'", label)).collect(Collectors.toList())))
                 .append(")")
                 .append("AND UPPER(C.TITLE) LIKE ?\n")
+                .append("AND C.CONTENT_STATUS = 'current'\n")
                 .append("ORDER BY TITLE\n")
                 .append("LIMIT ")
                 .append(limit)
@@ -206,7 +215,7 @@ public class FindResourceBase {
                     Long id = rs.getLong("CONTENTID");
                     obj.put("id", id);
                     obj.put("title", rs.getString("TITLE"));
-                    obj.put("href", String.format("%s/rest/data-share/1.0/page/%d", baseUrl, id));
+                    obj.put("href", String.format("%s%s/page/%d", baseUrl, REST_API_PATH, id));
                     obj.put("view", String.format("%s/pages/viewpage.action?pageId=%d", baseUrl, id));
                     obj.set("data", mapper.readTree(rs.getString("DATA")));
                     arr.add(obj);

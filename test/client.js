@@ -1,5 +1,5 @@
 const ConfluenceClient = require('confluence-client');
-const REST_API_PATH = "/rest/data-share/1.0";
+const REST_API_PATH = "/rest/blueprint-validation/1.0";
 
 function Client(options) {
     ConfluenceClient.apply(this, [options]);

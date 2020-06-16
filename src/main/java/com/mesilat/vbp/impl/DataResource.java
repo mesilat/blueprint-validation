@@ -3,6 +3,7 @@ package com.mesilat.vbp.impl;
 import com.atlassian.confluence.pages.Page;
 import com.atlassian.confluence.pages.PageManager;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.mesilat.vbp.Constants;
@@ -30,6 +31,8 @@ public class DataResource {
     private final ValidationService validationService;
     @ComponentImport
     private final PageManager pageManager;
+    @ComponentImport
+    private final TransactionTemplate transactionTemplate;
 
     @POST
     @Path("/")
@@ -96,10 +99,25 @@ public class DataResource {
         }
     }
 
+    @POST
+    @Path("/template/{id}")
+    public Response setTemplate(@PathParam("id") Long pageId, @QueryParam("templateKey") String templateKey) {
+        LOGGER.trace(String.format("Set page %d template key to %s", pageId, templateKey));
+
+        Page page = pageManager.getPage(pageId);
+        return transactionTemplate.execute(() -> {
+            page.getProperties().setStringProperty(PROPERTY_TEMPLATE, templateKey);
+            return Response.status(Response.Status.ACCEPTED).build();
+        });
+    }
+
     @Inject
-    public DataResource(PathService pathService, ValidationService validationService, PageManager pageManager) {
+    public DataResource(PathService pathService, ValidationService validationService, PageManager pageManager,
+        TransactionTemplate transactionTemplate
+    ) {
         this.pathService = pathService;
         this.validationService = validationService;
         this.pageManager = pageManager;
+        this.transactionTemplate = transactionTemplate;
     }
 }
