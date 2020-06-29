@@ -34,9 +34,10 @@ public class FindResourceBase {
 
         if (databaseType == DatabaseType.POSTGRESQL) {
             sql = (new StringBuilder())
-                .append("SELECT C.CONTENTID, C.TITLE, D.\"DATA\"\n")
+                .append("SELECT C.CONTENTID, C.TITLE, D.\"DATA\", P.STRINGVAL\n")
                 .append("FROM \"").append(PAGE_INFO).append("\" D\n")
                 .append("JOIN \"content\" C ON D.\"PAGE_ID\" = C.CONTENTID\n")
+                .append("LEFT JOIN \"contentproperties\" P ON P.CONTENTID = C.CONTENTID AND P.PROPERTYNAME = 'com.mesilat.vbp.template'\n")
                 .append("WHERE UPPER(C.TITLE) LIKE ?\n")
                 .append("AND C.CONTENT_STATUS = 'current'\n")
                 .append("ORDER BY TITLE\n")
@@ -45,9 +46,10 @@ public class FindResourceBase {
                 .toString();
         } else {
             sql = (new StringBuilder())
-                .append("SELECT C.CONTENTID, C.TITLE, D.DATA\n")
+                .append("SELECT C.CONTENTID, C.TITLE, D.DATA, P.STRINGVAL\n")
                 .append("FROM ").append(PAGE_INFO).append(" D\n")
                 .append("JOIN CONTENT C ON D.PAGE_ID = C.CONTENTID\n")
+                .append("LEFT JOIN CONTENTPROPERTIES P ON P.CONTENTID = C.CONTENTID AND P.PROPERTYNAME = 'com.mesilat.vbp.template'\n")
                 .append("WHERE UPPER(C.TITLE) LIKE ?\n")
                 .append("AND C.CONTENT_STATUS = 'current'\n")
                 .append("ORDER BY TITLE\n")
@@ -71,6 +73,7 @@ public class FindResourceBase {
                     obj.put("href", String.format("%s%s/page/%d", baseUrl, REST_API_PATH, id));
                     obj.put("view", String.format("%s/pages/viewpage.action?pageId=%d", baseUrl, id));
                     obj.set("data", mapper.readTree(rs.getString("DATA")));
+                    obj.put("template", rs.getString("STRINGVAL"));
                     arr.add(obj);
                 }
             }
@@ -85,11 +88,12 @@ public class FindResourceBase {
         
         if (databaseType == DatabaseType.POSTGRESQL) {
             sql = (new StringBuilder())
-                .append("SELECT C.CONTENTID, C.TITLE, D.\"DATA\"\n")
+                .append("SELECT C.CONTENTID, C.TITLE, D.\"DATA\", P.STRINGVAL\n")
                 .append("FROM \"").append(PAGE_INFO).append("\" D\n")
                 .append("JOIN \"content\" C ON D.\"PAGE_ID\" = C.CONTENTID\n")
                 .append("JOIN \"content_label\" CL ON CL.CONTENTID = C.CONTENTID\n")
                 .append("JOIN \"label\" L ON CL.LABELID = L.LABELID\n")
+                .append("LEFT JOIN \"contentproperties\" P ON P.CONTENTID = C.CONTENTID AND P.PROPERTYNAME = 'com.mesilat.vbp.template'\n")
                 .append("WHERE L.NAME IN (\n")
                 .append(String.join(",", labels.stream().map(label -> String.format("'%s'", label)).collect(Collectors.toList())))
                 .append(")")
@@ -101,11 +105,12 @@ public class FindResourceBase {
                 .toString();
         } else {
             sql = (new StringBuilder())
-                .append("SELECT C.CONTENTID, C.TITLE, D.DATA\n")
+                .append("SELECT C.CONTENTID, C.TITLE, D.DATA, P.STRINGVAL\n")
                 .append("FROM ").append(PAGE_INFO).append(" D\n")
                 .append("JOIN CONTENT C ON D.PAGE_ID = C.CONTENTID\n")
                 .append("JOIN CONTENT_LABEL CL ON CL.CONTENTID = C.CONTENTID\n")
                 .append("JOIN LABEL L ON CL.LABELID = L.LABELID\n")
+                .append("LEFT JOIN CONTENTPROPERTIES P ON P.CONTENTID = C.CONTENTID AND P.PROPERTYNAME = 'com.mesilat.vbp.template'\n")
                 .append("WHERE L.NAME IN (\n")
                 .append(String.join(",", labels.stream().map(label -> String.format("'%s'", label)).collect(Collectors.toList())))
                 .append(")")
@@ -132,6 +137,7 @@ public class FindResourceBase {
                     obj.put("href", String.format("%s%s/page/%d", baseUrl, REST_API_PATH, id));
                     obj.put("view", String.format("%s/pages/viewpage.action?pageId=%d", baseUrl, id));
                     obj.set("data", mapper.readTree(rs.getString("DATA")));
+                    obj.put("template", rs.getString("STRINGVAL"));
                     arr.add(obj);
                 }
             }
@@ -146,22 +152,24 @@ public class FindResourceBase {
 
         if (databaseType == DatabaseType.POSTGRESQL) {
             sql = (new StringBuilder())
-                .append("SELECT C.CONTENTID, C.TITLE, D.\"DATA\"\n")
+                .append("SELECT C.CONTENTID, C.TITLE, D.\"DATA\", P.STRINGVAL\n")
                 .append("FROM \"").append(PAGE_INFO).append("\" D\n")
                 .append("JOIN \"content\" C ON D.\"PAGE_ID\" = C.CONTENTID\n")
                 .append("JOIN \"content_label\" CL ON CL.CONTENTID = C.CONTENTID\n")
                 .append("JOIN \"label\" L ON CL.LABELID = L.LABELID\n")
+                .append("LEFT JOIN \"contentproperties\" P ON P.CONTENTID = C.CONTENTID AND P.PROPERTYNAME = 'com.mesilat.vbp.template'\n")
                 .append("WHERE L.NAME IN (\n")
                 .append(String.join(",", labels.stream().map(label -> String.format("'%s'", label)).collect(Collectors.toList())))
                 .append(")")
                 .append("AND UPPER(D.\"DATA\") LIKE ?\n")
                 .append("AND C.CONTENT_STATUS = 'current'\n")
                 .append("UNION\n")
-                .append("SELECT C.CONTENTID, C.TITLE, D.\"DATA\"\n")
+                .append("SELECT C.CONTENTID, C.TITLE, D.\"DATA\", P.STRINGVAL\n")
                 .append("FROM \"").append(PAGE_INFO).append("\" D\n")
                 .append("JOIN \"content\" C ON D.\"PAGE_ID\" = C.CONTENTID\n")
                 .append("JOIN \"content_label\" CL ON CL.CONTENTID = C.CONTENTID\n")
                 .append("JOIN \"label\" L ON CL.LABELID = L.LABELID\n")
+                .append("LEFT JOIN \"contentproperties\" P ON P.CONTENTID = C.CONTENTID AND P.PROPERTYNAME = 'com.mesilat.vbp.template'\n")
                 .append("WHERE L.NAME IN (\n")
                 .append(String.join(",", labels.stream().map(label -> String.format("'%s'", label)).collect(Collectors.toList())))
                 .append(")")
@@ -173,22 +181,24 @@ public class FindResourceBase {
                 .toString();
         } else {
             sql = (new StringBuilder())
-                .append("SELECT C.CONTENTID, C.TITLE, D.DATA\n")
+                .append("SELECT C.CONTENTID, C.TITLE, D.DATA, P.STRINGVAL\n")
                 .append("FROM ").append(PAGE_INFO).append(" D\n")
                 .append("JOIN CONTENT C ON D.PAGE_ID = C.CONTENTID\n")
                 .append("JOIN CONTENT_LABEL CL ON CL.CONTENTID = C.CONTENTID\n")
                 .append("JOIN LABEL L ON CL.LABELID = L.LABELID\n")
+                .append("LEFT JOIN CONTENTPROPERTIES P ON P.CONTENTID = C.CONTENTID AND P.PROPERTYNAME = 'com.mesilat.vbp.template'\n")
                 .append("WHERE L.NAME IN (\n")
                 .append(String.join(",", labels.stream().map(label -> String.format("'%s'", label)).collect(Collectors.toList())))
                 .append(")")
                 .append("AND UPPER(D.DATA) LIKE ?\n")
                 .append("AND C.CONTENT_STATUS = 'current'\n")
                 .append("UNION\n")
-                .append("SELECT C.CONTENTID, C.TITLE, D.DATA\n")
+                .append("SELECT C.CONTENTID, C.TITLE, D.DATA, P.STRINGVAL\n")
                 .append("FROM ").append(PAGE_INFO).append(" D\n")
                 .append("JOIN CONTENT C ON D.PAGE_ID = C.CONTENTID\n")
                 .append("JOIN CONTENT_LABEL CL ON CL.CONTENTID = C.CONTENTID\n")
                 .append("JOIN LABEL L ON CL.LABELID = L.LABELID\n")
+                .append("LEFT JOIN CONTENTPROPERTIES P ON P.CONTENTID = C.CONTENTID AND P.PROPERTYNAME = 'com.mesilat.vbp.template'\n")
                 .append("WHERE L.NAME IN (\n")
                 .append(String.join(",", labels.stream().map(label -> String.format("'%s'", label)).collect(Collectors.toList())))
                 .append(")")
@@ -218,6 +228,7 @@ public class FindResourceBase {
                     obj.put("href", String.format("%s%s/page/%d", baseUrl, REST_API_PATH, id));
                     obj.put("view", String.format("%s/pages/viewpage.action?pageId=%d", baseUrl, id));
                     obj.set("data", mapper.readTree(rs.getString("DATA")));
+                    obj.put("template", rs.getString("STRINGVAL"));
                     arr.add(obj);
                 }
             }
