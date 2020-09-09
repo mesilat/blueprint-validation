@@ -88,7 +88,7 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
         }
 
         if (templateInfo == null) {
-            LOGGER.trace("No X_VBP_TEMPLATE header, not validating");
+            LOGGER.debug("No X_VBP_TEMPLATE header, not validating");
             response.setHeader(X_BLUEPRINT_VALIDATION, "not validated");
             chain.doFilter(request, resp);
 
@@ -102,7 +102,7 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
             doFilterCreate(request, response, chain, templateInfo);
 
         } else {
-            LOGGER.trace("Cannot validate template");
+            LOGGER.debug("Cannot validate template");
             response.setHeader(X_BLUEPRINT_VALIDATION, "not validated");
             chain.doFilter(request, resp);
         }
@@ -131,7 +131,19 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                     response.setHeader(X_BLUEPRINT_VALIDATION, "pending validation");
                     response.setHeader(X_BLUEPRINT_VALIDATION_TASK, uuid);
 
-                    Long pageId = super.doProcess(request, response, chain);
+                    GenericRequestWrapper wrappedRequest = new GenericRequestWrapper(request);
+                    ObjectNode obj;
+                    try (InputStream in = wrappedRequest.getInputStream()){
+                        obj = (ObjectNode)mapper.readTree(in);
+                    }
+                    normalizeObjectIds(null, wrappedRequest, obj);
+
+                    Long pageId = super.doProcess(wrappedRequest, response, chain);
+                    if (pageId == null) {
+                        LOGGER.error("Failed to get pageId");
+                        return;
+                    }
+
                     Page page = pageManager.getPage(pageId);
                     if (page == null) {
                         LOGGER.error("Failed to get page object");
@@ -155,7 +167,8 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                     try (InputStream in = wrappedRequest.getInputStream()){
                         obj = (ObjectNode)mapper.readTree(in);
                     }
-                    
+                    normalizeObjectIds(null, wrappedRequest, obj);
+
                     String storageFormat = getStorageFormat(obj);
                     String data = parserService.parse(storageFormat, spaceKey);
 
@@ -182,6 +195,7 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                             null,
                             data
                         );
+                        dataService.registerDataObjectIds(page.getId(), storageFormat);
                         return null;
                     });
                     Thread t = new Thread(() -> eventPublisher.publish(new DataCreateEvent(page, data, templateKey)));
@@ -224,7 +238,7 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
 
         Template template = templateManager.get(templateKey);
         if (template == null) {
-            LOGGER.trace("Not validating template");
+            LOGGER.debug("Not validating template");
             response.setHeader(X_BLUEPRINT_VALIDATION, "not validated");
             chain.doFilter(request, response);
             return;
@@ -244,7 +258,14 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                     response.setHeader(X_BLUEPRINT_VALIDATION, "pending validation");
                     response.setHeader(X_BLUEPRINT_VALIDATION_TASK, uuid);
 
-                    super.doProcess(request, response, chain);
+                    GenericRequestWrapper wrappedRequest = new GenericRequestWrapper(request);
+                    ObjectNode obj;
+                    try (InputStream in = wrappedRequest.getInputStream()){
+                        obj = (ObjectNode)mapper.readTree(in);
+                    }
+                    normalizeObjectIds(page.getId(), wrappedRequest, obj);
+
+                    super.doProcess(wrappedRequest, response, chain);
                     validationService.registerValidationTask(uuid, page.getId(), page.getTitle());
                     Thread t = new Thread(() -> {
                         String data = postValidate(uuid, page, templateKey);
@@ -260,6 +281,8 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                     try (InputStream in = wrappedRequest.getInputStream()){
                         obj = (ObjectNode)mapper.readTree(in);
                     }
+                    normalizeObjectIds(page.getId(), wrappedRequest, obj);
+
                     String storageFormat = getStorageFormat(obj);
                     String data = parserService.parse(storageFormat, page.getSpaceKey());
 
@@ -273,12 +296,14 @@ public class ValidatingServletFilter extends PageServletBase implements Filter {
                     super.doProcess(wrappedRequest, response, chain);
                     transactionTemplate.execute(() -> {
                         dataService.updatePageInfo(page, true, null, data);
+                        dataService.registerDataObjectIds(page.getId(), storageFormat);
                         return null;
                     });
 
                     Thread t = new Thread(() -> eventPublisher.publish(new DataUpdateEvent(page, data, templateKey, !oldPageTitle.equals(page.getTitle()))));
                     t.start();
                 } catch (Throwable ex) {
+                    LOGGER.error("Hm... something bad happend", ex);
                     sendError(response, ex);
                 }
             default:

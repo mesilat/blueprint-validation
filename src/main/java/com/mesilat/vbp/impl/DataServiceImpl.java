@@ -5,14 +5,19 @@ import com.atlassian.confluence.pages.Page;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mesilat.vbp.DataObject;
 import com.mesilat.vbp.PageInfo;
 import com.mesilat.vbp.api.DataService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.inject.Named;
 import net.java.ao.DBParam;
 
 @ExportAsService ({DataService.class, DataServiceEx.class})
 @Named ("vbpDataService")
 public class DataServiceImpl implements DataServiceEx {
+    private static final Pattern RE_OBJID = Pattern.compile("dsobjid-([0-9a-f\\-]+)");
+
     private final ActiveObjects ao;
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -54,15 +59,15 @@ public class DataServiceImpl implements DataServiceEx {
             pageInfo.setValidationMessage(message);
             pageInfo.save();
         } else {
-            if (!pageInfo.getTemplateKey().equals(templateKey)) {
-                throw new RuntimeException("Invalid page template key");
-            }
+            pageInfo.setTemplateKey(templateKey);
             pageInfo.setPageTitle(page.getTitle());
             pageInfo.setData(data);
             pageInfo.setValid(isValid);
             pageInfo.setValidationMessage(message);
             pageInfo.save();
         }
+        
+        
     }
     @Override
     public void updatePageInfo(Page page, Boolean isValid, String message, String data) {
@@ -88,6 +93,21 @@ public class DataServiceImpl implements DataServiceEx {
             pageInfo.setDeleted(Boolean.FALSE);
             pageInfo.save();
         }
+    }
+
+    @Override
+    public void registerDataObjectIds(long pageId, String storageFormat) {
+        ao.deleteWithSQL(DataObject.class, "PAGE_ID = ?", pageId);
+        Matcher m = RE_OBJID.matcher(storageFormat);
+        while (m.find()){
+            String objid = m.group(1);
+            ao.create(DataObject.class, new DBParam("ID", objid), new DBParam("PAGE_ID", pageId));
+        }
+    }
+    @Override
+    public Long getDataObjectPage(String objid) {
+        DataObject dataObject = ao.get(DataObject.class, objid);
+        return dataObject == null? null: dataObject.getPageId();
     }
 
     public DataServiceImpl(ActiveObjects ao) {

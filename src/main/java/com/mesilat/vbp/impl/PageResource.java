@@ -9,6 +9,7 @@ import com.atlassian.confluence.plugins.highlight.model.TextSearch;
 import com.atlassian.confluence.plugins.highlight.model.XMLModification;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.mesilat.vbp.Constants;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -32,6 +33,8 @@ public class PageResource {
     @ComponentImport
     private final SelectionStorageFormatModifier selectionStorageFormatModifier;
     private final ValidationServiceEx validationService;
+    private final DataServiceEx dataService;
+    private final TransactionTemplate transactionTemplate;
 
     @PUT
     @Path("/{id}")
@@ -81,14 +84,39 @@ public class PageResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         }
     }
+    /**
+     * Process page content and populate the DataObject table with object ids
+     * @param pageId
+     * @return no body
+     */
+    @POST
+    @Path("/{id}/dsobjid")
+    public Response processObjectIds(@PathParam("id") Long pageId){
+        Page page = pageManager.getPage(pageId);
+        if (page == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        String storageFormat = page.getBodyAsString();
+        if (storageFormat == null) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Page is empty").build();
+        }
+        return transactionTemplate.execute(() -> {
+            dataService.registerDataObjectIds(pageId, storageFormat);
+            return Response.status(Response.Status.ACCEPTED).build();
+        });
+    }
 
     @Inject
     public PageResource(PageManager pageManager,
             SelectionStorageFormatModifier selectionStorageFormatModifier,
-            ValidationServiceEx validationService
+            ValidationServiceEx validationService,
+            DataServiceEx dataService,
+            TransactionTemplate transactionTemplate
     ) {
         this.pageManager = pageManager;
         this.selectionStorageFormatModifier = selectionStorageFormatModifier;
         this.validationService = validationService;
+        this.dataService = dataService;
+        this.transactionTemplate = transactionTemplate;
     }
 }

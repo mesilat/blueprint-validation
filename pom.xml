@@ -7,11 +7,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.mesilat</groupId>
   <artifactId>blueprint-validation</artifactId>
-  <version>0.1.4</version>
+  <version>0.1.9</version>
+  <url>https://www.mesilat.com/blueprint-validation.html</url>
 
   <organization>
     <name>Mesilat Limited</name>
-    <url>http://www.mesilat.com/bvp/</url>
+    <url>https://www.mesilat.com</url>
   </organization>
 
   <name>Blueprint Validation</name>
@@ -20,6 +21,26 @@
     Confluence storage format to JSON and validating it against JSON schema
   </description>
   <packaging>atlassian-plugin</packaging>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://opensource.org/licenses/MIT</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>https://github.com/mesilat/blueprint-validation</url>
+    <connection>scm:hg:https://github.com/mesilat/blueprint-validation</connection>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>maintainer</id>
+      <name>Vladislav Babin</name>
+      <email>vb@mesilat.com</email>
+    </developer>
+  </developers>
 
   <dependencies>
     <dependency>
@@ -229,6 +250,18 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.7</version>
+        <extensions>true</extensions>
+        <configuration>
+           <serverId>ossrh</serverId>
+           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+           <autoReleaseAfterClose>true</autoReleaseAfterClose>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
@@ -260,6 +293,37 @@
                     <argument>watch:prepare</argument>
                   </arguments>
                 </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>sign-artifacts</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.4</version>
+            <configuration>
+              <passphrase>${gpg.passphrase}</passphrase>
+            </configuration>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
               </execution>
             </executions>
           </plugin>

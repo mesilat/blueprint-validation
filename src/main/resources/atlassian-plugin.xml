@@ -127,6 +127,7 @@
     <entity>com.mesilat.vbp.ValidatorInfo</entity>
     <entity>com.mesilat.vbp.TemplateInfo</entity>
     <entity>com.mesilat.vbp.PageInfo</entity>
+    <entity>com.mesilat.vbp.DataObject</entity>
   </ao>
 
   <xhtml-macro name="vbp-report" class="com.mesilat.vbp.macro.VbpReportMacro" key="vbp-report" state="enabled"

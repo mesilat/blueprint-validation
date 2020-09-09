@@ -120,20 +120,35 @@ public class ValidationServiceImpl implements ValidationServiceEx, InitializingB
 
     @Override
     public void validate(String templateKey, Page page) throws ParseException {
+        validate(templateKey, page, true);
+    }
+
+    @Override
+    public void validate(String templateKey, Page page, boolean transaction) throws ParseException {
         String data = parserService.parse(page.getBodyAsString(), page.getSpaceKey());
         try {
             validate(templateKey, data);
-            transactionTemplate.execute(() -> {
+            if (transaction) {
+                transactionTemplate.execute(() -> {
+                    page.getProperties().setStringProperty(PROPERTY_TEMPLATE, templateKey);
+                    dataService.createPageInfo(page, templateKey, true, null, data);
+                    return null;
+                });
+            } else {
                 page.getProperties().setStringProperty(PROPERTY_TEMPLATE, templateKey);
                 dataService.createPageInfo(page, templateKey, true, null, data);
-                return null;
-            });
+            }
         } catch (ValidationException ex) {
-            transactionTemplate.execute(() -> {
+            if (transaction) {
+                transactionTemplate.execute(() -> {
+                    page.getProperties().setStringProperty(PROPERTY_TEMPLATE, templateKey);
+                    dataService.createPageInfo(page, templateKey, false, ex.getMessage(), data);
+                    return null;
+                });
+            } else {
                 page.getProperties().setStringProperty(PROPERTY_TEMPLATE, templateKey);
                 dataService.createPageInfo(page, templateKey, false, ex.getMessage(), data);
-                return null;
-            });
+            }
         }
         eventPublisher.publish(new DataUpdateEvent(page, data, templateKey, false));
     }

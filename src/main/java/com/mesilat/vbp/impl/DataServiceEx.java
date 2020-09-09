@@ -12,4 +12,7 @@ public interface DataServiceEx extends DataService {
     void updatePageInfo(Page page, Boolean isValid, String message, String data);
     void deletePageInfo(Page page);
     void undeletePageInfo(Page page);
+
+    void registerDataObjectIds(long pageId, String storageFormat);
+    Long getDataObjectPage(String objid);
 }

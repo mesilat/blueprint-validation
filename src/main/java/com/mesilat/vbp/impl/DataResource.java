@@ -99,6 +99,14 @@ public class DataResource {
         }
     }
 
+    @GET
+    @Path("/template/{id}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public Response getTemplate(@PathParam("id") Long pageId) {
+        Page page = pageManager.getPage(pageId);
+        return Response.ok(String.format("\"%s\"", page.getProperties().getStringProperty(PROPERTY_TEMPLATE))).build();
+    }
+
     @POST
     @Path("/template/{id}")
     public Response setTemplate(@PathParam("id") Long pageId, @QueryParam("templateKey") String templateKey) {

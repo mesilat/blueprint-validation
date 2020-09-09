@@ -5,6 +5,7 @@ import com.atlassian.cache.Cache;
 import com.atlassian.cache.CacheLoader;
 import com.atlassian.cache.CacheManager;
 import com.atlassian.cache.CacheSettingsBuilder;
+import com.atlassian.confluence.event.events.content.page.PageCopyEvent;
 import com.atlassian.confluence.event.events.content.page.PageRemoveEvent;
 import com.atlassian.confluence.event.events.content.page.PageRestoreEvent;
 import com.atlassian.confluence.event.events.content.page.PageTrashedEvent;
@@ -15,6 +16,7 @@ import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -37,6 +39,7 @@ import com.mesilat.vbp.api.DataUpdateEvent;
 import com.mesilat.vbp.api.DataValidateEvent;
 import com.mesilat.vbp.api.PathService;
 import com.mesilat.vbp.api.TemplateManager;
+import static com.mesilat.vbp.servlet.PageServletBase.PROPERTY_TEMPLATE;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -67,6 +70,8 @@ public class PathServiceImpl implements PathService, InitializingBean, Disposabl
     private final DataServiceEx dataService;
     private final String baseUrl;
     private final Gson gson = (new GsonBuilder()).setPrettyPrinting().create();
+    @ComponentImport
+    private final TransactionTemplate transactionTemplate;
 
     @Override
     public Object evaluate(String path) {
@@ -248,6 +253,16 @@ public class PathServiceImpl implements PathService, InitializingBean, Disposabl
         }
         resetCache(info.getTemplateKey());
     }
+    @EventListener
+    public void pageCopyEvent(PageCopyEvent event) {
+        String templateKey = event.getOrigin().getProperties().getStringProperty(PROPERTY_TEMPLATE);
+        if (templateKey != null) {
+            transactionTemplate.execute(() -> {
+                event.getDestination().getProperties().setStringProperty(PROPERTY_TEMPLATE, templateKey);
+                return null;
+            });
+        }
+    }
     */
     @EventListener
     public void validateEvent(DataValidateEvent event) {
@@ -316,7 +331,8 @@ public class PathServiceImpl implements PathService, InitializingBean, Disposabl
         @ComponentImport SettingsManager settingsManager,
         TemplateManager templateManager,
         @ComponentImport CacheManager cacheManager,
-        EventPublisher eventPublisher, DataServiceEx dataService
+        EventPublisher eventPublisher, DataServiceEx dataService,
+        TransactionTemplate transactionTemplate
     ){
         this.ao = ao;
         this.baseUrl = settingsManager.getGlobalSettings().getBaseUrl();
@@ -324,6 +340,7 @@ public class PathServiceImpl implements PathService, InitializingBean, Disposabl
         this.templateManager = templateManager;
         this.eventPublisher = eventPublisher;
         this.dataService = dataService;
+        this.transactionTemplate = transactionTemplate;
 
         this.cache = cacheManager.getCache(PathServiceImpl.class.getName() + ".cache",
             new DataCacheLoader(),

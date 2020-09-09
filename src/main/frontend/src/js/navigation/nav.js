@@ -5,8 +5,10 @@ import { get } from "../api";
 import { X_VBP_TEMPLATE, REST_API_PATH } from "../constants";
 
 const getTemplateSetting = async templateKey => get(`${REST_API_PATH}/template/${templateKey}`);
+const getTemplateForPage = async pageId => get(`${REST_API_PATH}/data/template/${pageId}`);
 
 export async function checkLocation() {
+  // Create page from blueprint
   if (window.location.pathname.endsWith("/pages/createpage-entervariables.action")) {
     const draftId = $("input#draftId").val();
     if (!draftId) {
@@ -18,12 +20,31 @@ export async function checkLocation() {
     }
     const templateKey = query.get("templateId");
     const spaceKey = query.get("spaceKey");
-    const data = {
-      draftId, templateKey, spaceKey
-    };
+    const data = { draftId, templateKey, spaceKey };
     const templateSettings = await getTemplateSetting(templateKey);
     _.extend(data, templateSettings);
     trace("nav::checkLocation", data);
     $(window.document).data(X_VBP_TEMPLATE, data);
+
+  // Create page from copy
+  } else if (window.location.pathname.endsWith("/pages/copypage.action")) {
+    const query = new URLSearchParams(window.location.search);
+    if (!query.has("idOfPageToCopy")) {
+      return;
+    }
+    const idOfPageToCopy = query.get("idOfPageToCopy");
+    const spaceKey = query.get("spaceKey");
+    try {
+      const templateKey = await getTemplateForPage(idOfPageToCopy);
+      if (templateKey) {
+        const data = { templateKey, spaceKey };
+        const templateSettings = await getTemplateSetting(templateKey);
+        _.extend(data, templateSettings);
+        trace("nav::checkLocation", data);
+        $(window.document).data(X_VBP_TEMPLATE, data);
+      }
+    } catch (err) {
+      trace(err);
+    }
   }
 }

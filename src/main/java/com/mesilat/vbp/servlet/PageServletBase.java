@@ -21,6 +21,11 @@ import com.mesilat.vbp.impl.ValidationServiceEx;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -31,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 public class PageServletBase {
     public static final String PROPERTY_TEMPLATE = "com.mesilat.vbp.template";
+    private static final Pattern RE_OBJID = Pattern.compile("dsobjid-([0-9a-f\\-]+)");
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(Constants.PLUGIN_KEY);
 
@@ -121,6 +127,7 @@ public class PageServletBase {
                     throw new ValidationException(String.join("\n", event.getMessages()));
 
                 dataService.createPageInfo(page, templateKey, true, null, data);
+                dataService.registerDataObjectIds(page.getId(), storageFormat);
             } catch (Throwable ex) {
                 dataService.createPageInfo(page, templateKey, false, ex.getMessage(), data);
             }
@@ -173,6 +180,44 @@ public class PageServletBase {
             page.getProperties().setStringProperty(PROPERTY_TEMPLATE, templateKey);
             return null;
         });
+    }
+    protected void normalizeObjectIds(Long pageId, GenericRequestWrapper wrappedRequest, ObjectNode obj){        
+        if (obj.has("body") && obj.get("body").has("editor") && obj.get("body").get("editor").has("value")) {
+            String editorFormat = obj.get("body").get("editor").get("value").asText();
+
+            int n = 0;
+            Matcher m = RE_OBJID.matcher(editorFormat);
+            StringBuffer sb = new StringBuffer(editorFormat.length());
+            Map<String,Boolean> map = new HashMap<>();
+            while (m.find()){
+                String objid = m.group(1);
+                if (map.containsKey(objid)){
+                    objid = UUID.randomUUID().toString();//.toLowerCase();
+                    n++;
+                } else {
+                    Long existingPageId = dataService.getDataObjectPage(objid);
+                    if (existingPageId != null && !existingPageId.equals(pageId)){
+                        objid = UUID.randomUUID().toString();//.toLowerCase();
+                        n++;
+                    }
+                }
+
+                m.appendReplacement(sb, String.format("dsobjid-%s", objid));
+                map.put(objid, Boolean.TRUE);
+            }
+            m.appendTail(sb);
+            
+            if (n > 0) {
+                try {
+                    LOGGER.debug(String.format("Total objid replacements: %d", n));
+                    ObjectNode editor = (ObjectNode)obj.get("body").get("editor");
+                    editor.put("value", sb.toString());
+                    wrappedRequest.setBody(mapper.writeValueAsBytes(obj));
+                } catch (JsonProcessingException ex) {
+                    LOGGER.error("Failed to update page body via normalizeObjectIds()", ex);
+                }
+            }
+        }
     }
 
     public PageServletBase(
