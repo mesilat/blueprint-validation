@@ -1,0 +1,902 @@
+[
+  {
+    "position": "1",
+    "title": "Apple",
+    "value": "961.3",
+    "assets": "373.7",
+    "sales": "261.7",
+    "profits": "59.4",
+    "country": "US"
+  },
+  {
+    "position": "2",
+    "title": "Microsoft",
+    "value": "946.5",
+    "assets": "258.9",
+    "sales": "118.2",
+    "profits": "33.5",
+    "country": "US"
+  },
+  {
+    "position": "3",
+    "title": "Amazon",
+    "value": "916.1",
+    "assets": "162.6",
+    "sales": "232.9",
+    "profits": "10.1",
+    "country": "US"
+  },
+  {
+    "position": "4",
+    "title": "Alphabet",
+    "value": "863.2",
+    "assets": "232.8",
+    "sales": "137",
+    "profits": "30.7",
+    "country": "US"
+  },
+  {
+    "position": "5",
+    "title": "Berkshire Hathaway",
+    "value": "516.4",
+    "assets": "707.8",
+    "sales": "247.8",
+    "profits": "4",
+    "country": "US"
+  },
+  {
+    "position": "6",
+    "title": "Facebook",
+    "value": "512",
+    "assets": "97.3",
+    "sales": "55.8",
+    "profits": "22.1",
+    "country": "US"
+  },
+  {
+    "position": "7",
+    "title": "Alibaba",
+    "value": "480.8",
+    "assets": "133.7",
+    "sales": "51.9",
+    "profits": "10.3",
+    "country": "CN"
+  },
+  {
+    "position": "8",
+    "title": "Tencent Holdings",
+    "value": "472.1",
+    "assets": "105.4",
+    "sales": "47.2",
+    "profits": "11.9",
+    "country": "CN"
+  },
+  {
+    "position": "9",
+    "title": "JPMorgan Chase",
+    "value": "368.5",
+    "assets": "2737.2",
+    "sales": "132.9",
+    "profits": "32.7",
+    "country": "US"
+  },
+  {
+    "position": "10",
+    "title": "Johnson & Johnson",
+    "value": "366.2",
+    "assets": "153",
+    "sales": "81.6",
+    "profits": "14.7",
+    "country": "US"
+  },
+  {
+    "position": "11",
+    "title": "Visa",
+    "value": "351.9",
+    "assets": "71.7",
+    "sales": "21.3",
+    "profits": "10.4",
+    "country": "US"
+  },
+  {
+    "position": "12",
+    "title": "ExxonMobil",
+    "value": "343.4",
+    "assets": "346.2",
+    "sales": "279.2",
+    "profits": "20.8",
+    "country": "US"
+  },
+  {
+    "position": "13",
+    "title": "ICBC",
+    "value": "305.1",
+    "assets": "4034.5",
+    "sales": "175.9",
+    "profits": "45.2",
+    "country": "CN"
+  },
+  {
+    "position": "14",
+    "title": "Walmart",
+    "value": "296.1",
+    "assets": "219.3",
+    "sales": "514.4",
+    "profits": "6.7",
+    "country": "US"
+  },
+  {
+    "position": "15",
+    "title": "Bank of America",
+    "value": "287.3",
+    "assets": "2377.2",
+    "sales": "111.9",
+    "profits": "28.5",
+    "country": "US"
+  },
+  {
+    "position": "16",
+    "title": "Nestle",
+    "value": "281.3",
+    "assets": "139",
+    "sales": "93.4",
+    "profits": "10.4",
+    "country": "CH"
+  },
+  {
+    "position": "17",
+    "title": "Samsung Electronics",
+    "value": "272.4",
+    "assets": "304.1",
+    "sales": "221.5",
+    "profits": "39.9",
+    "country": "KR"
+  },
+  {
+    "position": "18",
+    "title": "Procter & Gamble",
+    "value": "265.3",
+    "assets": "123.7",
+    "sales": "66.9",
+    "profits": "10.8",
+    "country": "US"
+  },
+  {
+    "position": "19",
+    "title": "Royal Dutch Shell",
+    "value": "264.9",
+    "assets": "399.2",
+    "sales": "382.6",
+    "profits": "23.3",
+    "country": "NL"
+  },
+  {
+    "position": "20",
+    "title": "Intel",
+    "value": "263.1",
+    "assets": "128",
+    "sales": "70.8",
+    "profits": "21.1",
+    "country": "US"
+  },
+  {
+    "position": "21",
+    "title": "Cisco Systems",
+    "value": "248.3",
+    "assets": "102.5",
+    "sales": "50.8",
+    "profits": "12.9",
+    "country": "US"
+  },
+  {
+    "position": "22",
+    "title": "Mastercard",
+    "value": "247.1",
+    "assets": "24.9",
+    "sales": "15",
+    "profits": "5.9",
+    "country": "US"
+  },
+  {
+    "position": "23",
+    "title": "Verizon Communications",
+    "value": "239.7",
+    "assets": "264.8",
+    "sales": "130.9",
+    "profits": "15.5",
+    "country": "US"
+  },
+  {
+    "position": "24",
+    "title": "Walt Disney",
+    "value": "238.1",
+    "assets": "99.9",
+    "sales": "59.4",
+    "profits": "11",
+    "country": "US"
+  },
+  {
+    "position": "25",
+    "title": "AT&T",
+    "value": "233.3",
+    "assets": "531.9",
+    "sales": "170.8",
+    "profits": "19.4",
+    "country": "US"
+  },
+  {
+    "position": "26",
+    "title": "Chevron",
+    "value": "228.3",
+    "assets": "253.9",
+    "sales": "158.7",
+    "profits": "14.8",
+    "country": "US"
+  },
+  {
+    "position": "27",
+    "title": "Home Depot",
+    "value": "226.8",
+    "assets": "44",
+    "sales": "108.2",
+    "profits": "11.1",
+    "country": "US"
+  },
+  {
+    "position": "28",
+    "title": "China Construction Bank",
+    "value": "225",
+    "assets": "3382.4",
+    "sales": "150.3",
+    "profits": "38.8",
+    "country": "CN"
+  },
+  {
+    "position": "29",
+    "title": "Nike",
+    "value": "224.3",
+    "assets": "22.9",
+    "sales": "38.7",
+    "profits": "4.2",
+    "country": "US"
+  },
+  {
+    "position": "30",
+    "title": "Taiwan Semiconductor",
+    "value": "222.4",
+    "assets": "68",
+    "sales": "34.2",
+    "profits": "11.6",
+    "country": "TW"
+  },
+  {
+    "position": "31",
+    "title": "Roche Holding",
+    "value": "222",
+    "assets": "79.6",
+    "sales": "58.1",
+    "profits": "10.7",
+    "country": "CH"
+  },
+  {
+    "position": "32",
+    "title": "Ping An Insurance Group",
+    "value": "220.2",
+    "assets": "1038.3",
+    "sales": "151.8",
+    "profits": "16.3",
+    "country": "CN"
+  },
+  {
+    "position": "33",
+    "title": "Pfizer",
+    "value": "218.6",
+    "assets": "159.4",
+    "sales": "53.6",
+    "profits": "11.2",
+    "country": "US"
+  },
+  {
+    "position": "34",
+    "title": "Wells Fargo",
+    "value": "214.7",
+    "assets": "1887.8",
+    "sales": "101.5",
+    "profits": "23.1",
+    "country": "US"
+  },
+  {
+    "position": "35",
+    "title": "Boeing",
+    "value": "214.5",
+    "assets": "117.4",
+    "sales": "101.1",
+    "profits": "10.5",
+    "country": "US"
+  },
+  {
+    "position": "36",
+    "title": "UnitedHealth Group",
+    "value": "212.8",
+    "assets": "161.2",
+    "sales": "231.4",
+    "profits": "12.6",
+    "country": "US"
+  },
+  {
+    "position": "37",
+    "title": "Coca-Cola",
+    "value": "203",
+    "assets": "83.2",
+    "sales": "31.7",
+    "profits": "6.4",
+    "country": "US"
+  },
+  {
+    "position": "38",
+    "title": "PetroChina",
+    "value": "198.7",
+    "assets": "354.3",
+    "sales": "322.8",
+    "profits": "8",
+    "country": "CN"
+  },
+  {
+    "position": "39",
+    "title": "China Mobile",
+    "value": "197.6",
+    "assets": "223.7",
+    "sales": "111.8",
+    "profits": "17.9",
+    "country": "HK"
+  },
+  {
+    "position": "40",
+    "title": "Agriculturalank of China",
+    "value": "197",
+    "assets": "3293.1",
+    "sales": "137.5",
+    "profits": "30.9",
+    "country": "CN"
+  },
+  {
+    "position": "41",
+    "title": "Comcast",
+    "value": "192",
+    "assets": "251.7",
+    "sales": "94.5",
+    "profits": "11.7",
+    "country": "US"
+  },
+  {
+    "position": "42",
+    "title": "Merck & Co.",
+    "value": "189.1",
+    "assets": "82.6",
+    "sales": "42.3",
+    "profits": "6.2",
+    "country": "US"
+  },
+  {
+    "position": "43",
+    "title": "Oracle",
+    "value": "186.3",
+    "assets": "109.4",
+    "sales": "39.6",
+    "profits": "10.8",
+    "country": "US"
+  },
+  {
+    "position": "44",
+    "title": "PepsiCo",
+    "value": "178.2",
+    "assets": "75.5",
+    "sales": "65",
+    "profits": "12.6",
+    "country": "US"
+  },
+  {
+    "position": "45",
+    "title": "Kweichow Moutai",
+    "value": "177.1",
+    "assets": "23.3",
+    "sales": "10",
+    "profits": "5.3",
+    "country": "CN"
+  },
+  {
+    "position": "46",
+    "title": "Toyota Motor",
+    "value": "176.6",
+    "assets": "465.6",
+    "sales": "272.1",
+    "profits": "17.2",
+    "country": "JP"
+  },
+  {
+    "position": "47",
+    "title": "Anheuser-Busch InBev",
+    "value": "175.7",
+    "assets": "233.8",
+    "sales": "54.6",
+    "profits": "4.3",
+    "country": "BE"
+  },
+  {
+    "position": "48",
+    "title": "Novartis",
+    "value": "175.6",
+    "assets": "145.6",
+    "sales": "51.9",
+    "profits": "12.6",
+    "country": "CH"
+  },
+  {
+    "position": "49",
+    "title": "HSBC Holdings",
+    "value": "175.5",
+    "assets": "2558.1",
+    "sales": "64.3",
+    "profits": "13.7",
+    "country": "UK"
+  },
+  {
+    "position": "50",
+    "title": "Citigroup",
+    "value": "161.1",
+    "assets": "1958.4",
+    "sales": "100",
+    "profits": "17.9",
+    "country": "US"
+  },
+  {
+    "position": "51",
+    "title": "Netflix",
+    "value": "157.3",
+    "assets": "26",
+    "sales": "15.8",
+    "profits": "1.2",
+    "country": "US"
+  },
+  {
+    "position": "52",
+    "title": "Unilever",
+    "value": "153.6",
+    "assets": "68",
+    "sales": "60.1",
+    "profits": "11.1",
+    "country": "NL"
+  },
+  {
+    "position": "53",
+    "title": "L'Oréal",
+    "value": "153",
+    "assets": "44",
+    "sales": "31.8",
+    "profits": "4.6",
+    "country": "FR"
+  },
+  {
+    "position": "54",
+    "title": "BP",
+    "value": "149.5",
+    "assets": "282.2",
+    "sales": "299.1",
+    "profits": "9.3",
+    "country": "UK"
+  },
+  {
+    "position": "55",
+    "title": "Total",
+    "value": "149.5",
+    "assets": "256.8",
+    "sales": "184.2",
+    "profits": "11.4",
+    "country": "FR"
+  },
+  {
+    "position": "56",
+    "title": "McDonald's",
+    "value": "148.8",
+    "assets": "32.8",
+    "sales": "21",
+    "profits": "5.9",
+    "country": "US"
+  },
+  {
+    "position": "57",
+    "title": "Bank of China",
+    "value": "143",
+    "assets": "3097.6",
+    "sales": "126.7",
+    "profits": "27.5",
+    "country": "CN"
+  },
+  {
+    "position": "58",
+    "title": "BHP Group",
+    "value": "138.3",
+    "assets": "102.4",
+    "sales": "42.6",
+    "profits": "6",
+    "country": "AU"
+  },
+  {
+    "position": "59",
+    "title": "SAP",
+    "value": "134.9",
+    "assets": "58.9",
+    "sales": "29.1",
+    "profits": "4.8",
+    "country": "DE"
+  },
+  {
+    "position": "60",
+    "title": "Adobe",
+    "value": "132",
+    "assets": "19.5",
+    "sales": "9.5",
+    "profits": "2.7",
+    "country": "US"
+  },
+  {
+    "position": "61",
+    "title": "Philip Morris International",
+    "value": "131.5",
+    "assets": "38",
+    "sales": "29.5",
+    "profits": "7.7",
+    "country": "US"
+  },
+  {
+    "position": "62",
+    "title": "China Merchantsank",
+    "value": "130.4",
+    "assets": "982.5",
+    "sales": "54.9",
+    "profits": "12.3",
+    "country": "CN"
+  },
+  {
+    "position": "63",
+    "title": "Abbott Laboratories",
+    "value": "129.8",
+    "assets": "67.2",
+    "sales": "30.7",
+    "profits": "2.6",
+    "country": "US"
+  },
+  {
+    "position": "64",
+    "title": "Reliance Industries",
+    "value": "126.4",
+    "assets": "124.6",
+    "sales": "79.7",
+    "profits": "5.6",
+    "country": "IN"
+  },
+  {
+    "position": "65",
+    "title": "Broadcom",
+    "value": "126.1",
+    "assets": "72.1",
+    "sales": "21.3",
+    "profits": "6.5",
+    "country": "US"
+  },
+  {
+    "position": "66",
+    "title": "3M",
+    "value": "126.1",
+    "assets": "36.5",
+    "sales": "32.8",
+    "profits": "5.3",
+    "country": "US"
+  },
+  {
+    "position": "67",
+    "title": "PayPal",
+    "value": "125.8",
+    "assets": "43.3",
+    "sales": "15.5",
+    "profits": "2.1",
+    "country": "US"
+  },
+  {
+    "position": "68",
+    "title": "Union Pacific",
+    "value": "125.6",
+    "assets": "59.6",
+    "sales": "22.8",
+    "profits": "6",
+    "country": "US"
+  },
+  {
+    "position": "69",
+    "title": "IBM",
+    "value": "124.9",
+    "assets": "130.9",
+    "sales": "78.7",
+    "profits": "8.6",
+    "country": "US"
+  },
+  {
+    "position": "70",
+    "title": "Honeywell International",
+    "value": "123.1",
+    "assets": "58.6",
+    "sales": "40.3",
+    "profits": "6.7",
+    "country": "US"
+  },
+  {
+    "position": "71",
+    "title": "AIA Group",
+    "value": "122.2",
+    "assets": "226.9",
+    "sales": "39.5",
+    "profits": "3.2",
+    "country": "HK"
+  },
+  {
+    "position": "72",
+    "title": "Salesforce.com",
+    "value": "120.9",
+    "assets": "30.7",
+    "sales": "13.3",
+    "profits": "1.1",
+    "country": "US"
+  },
+  {
+    "position": "73",
+    "title": "Eli Lilly",
+    "value": "119.3",
+    "assets": "43.9",
+    "sales": "24.6",
+    "profits": "3.2",
+    "country": "US"
+  },
+  {
+    "position": "74",
+    "title": "United Technologies",
+    "value": "118.1",
+    "assets": "134.2",
+    "sales": "66.5",
+    "profits": "5.3",
+    "country": "US"
+  },
+  {
+    "position": "75",
+    "title": "Novo Nordisk",
+    "value": "116.3",
+    "assets": "17",
+    "sales": "17.7",
+    "profits": "6.1",
+    "country": "DK"
+  },
+  {
+    "position": "76",
+    "title": "Tata Consultancy Services",
+    "value": "116.1",
+    "assets": "16.6",
+    "sales": "20.9",
+    "profits": "4.5",
+    "country": "IN"
+  },
+  {
+    "position": "77",
+    "title": "RBC",
+    "value": "114.9",
+    "assets": "1040.3",
+    "sales": "46.3",
+    "profits": "9.6",
+    "country": "CA"
+  },
+  {
+    "position": "78",
+    "title": "AbbVie",
+    "value": "114.7",
+    "assets": "59.4",
+    "sales": "32.8",
+    "profits": "5.7",
+    "country": "US"
+  },
+  {
+    "position": "79",
+    "title": "China Life Insurance",
+    "value": "114.2",
+    "assets": "474.8",
+    "sales": "98.3",
+    "profits": "1.9",
+    "country": "CN"
+  },
+  {
+    "position": "80",
+    "title": "Accenture",
+    "value": "113.9",
+    "assets": "27.4",
+    "sales": "42.5",
+    "profits": "4.5",
+    "country": "IE"
+  },
+  {
+    "position": "81",
+    "title": "NVIDIA",
+    "value": "113.4",
+    "assets": "13.3",
+    "sales": "11.7",
+    "profits": "4.1",
+    "country": "US"
+  },
+  {
+    "position": "82",
+    "title": "Medtronic",
+    "value": "113",
+    "assets": "88.7",
+    "sales": "30.6",
+    "profits": "4.9",
+    "country": "IE"
+  },
+  {
+    "position": "83",
+    "title": "Softbank",
+    "value": "112.4",
+    "assets": "332.3",
+    "sales": "86.2",
+    "profits": "13.9",
+    "country": "JP"
+  },
+  {
+    "position": "84",
+    "title": "Naspers",
+    "value": "111.3",
+    "assets": "35.8",
+    "sales": "6.9",
+    "profits": "13.5",
+    "country": "ZA"
+  },
+  {
+    "position": "85",
+    "title": "Amgen",
+    "value": "109.3",
+    "assets": "66.4",
+    "sales": "23.8",
+    "profits": "8.4",
+    "country": "US"
+  },
+  {
+    "position": "86",
+    "title": "Texas Instruments",
+    "value": "108.4",
+    "assets": "17.1",
+    "sales": "15.8",
+    "profits": "5.5",
+    "country": "US"
+  },
+  {
+    "position": "87",
+    "title": "Costco Wholesale",
+    "value": "108.1",
+    "assets": "42.8",
+    "sales": "147.2",
+    "profits": "3.4",
+    "country": "US"
+  },
+  {
+    "position": "88",
+    "title": "Sinopec",
+    "value": "105.6",
+    "assets": "233",
+    "sales": "399.7",
+    "profits": "9.5",
+    "country": "CN"
+  },
+  {
+    "position": "89",
+    "title": "AIRBUS",
+    "value": "104.9",
+    "assets": "131.7",
+    "sales": "75.2",
+    "profits": "3.6",
+    "country": "NL"
+  },
+  {
+    "position": "90",
+    "title": "Thermo Fisher Scientific",
+    "value": "103.9",
+    "assets": "56.2",
+    "sales": "24.4",
+    "profits": "2.9",
+    "country": "US"
+  },
+  {
+    "position": "91",
+    "title": "TDank Group",
+    "value": "103.8",
+    "assets": "1007",
+    "sales": "42.5",
+    "profits": "8.7",
+    "country": "CA"
+  },
+  {
+    "position": "92",
+    "title": "Allianz",
+    "value": "102.3",
+    "assets": "1060.2",
+    "sales": "118.8",
+    "profits": "8.8",
+    "country": "DE"
+  },
+  {
+    "position": "93",
+    "title": "Sanofi",
+    "value": "102",
+    "assets": "127.4",
+    "sales": "40.7",
+    "profits": "5.1",
+    "country": "FR"
+  },
+  {
+    "position": "94",
+    "title": "Altria Group",
+    "value": "101.8",
+    "assets": "55.6",
+    "sales": "19.6",
+    "profits": "7",
+    "country": "US"
+  },
+  {
+    "position": "95",
+    "title": "Saudiasic Industries",
+    "value": "100",
+    "assets": "85.3",
+    "sales": "45.1",
+    "profits": "5.7",
+    "country": "SA"
+  },
+  {
+    "position": "96",
+    "title": "Rio Tinto",
+    "value": "100",
+    "assets": "90.9",
+    "sales": "40.5",
+    "profits": "13.8",
+    "country": "UK"
+  },
+  {
+    "position": "97",
+    "title": "AstraZeneca",
+    "value": "99.2",
+    "assets": "60.7",
+    "sales": "23.9",
+    "profits": "2.2",
+    "country": "UK"
+  },
+  {
+    "position": "98",
+    "title": "Linde",
+    "value": "98.3",
+    "assets": "93.4",
+    "sales": "14.9",
+    "profits": "4.4",
+    "country": "UK"
+  },
+  {
+    "position": "99",
+    "title": "United Parcel Service",
+    "value": "98.3",
+    "assets": "50",
+    "sales": "71.9",
+    "profits": "4.8",
+    "country": "US"
+  },
+  {
+    "position": "100",
+    "title": "Inditex",
+    "value": "98",
+    "assets": "24.9",
+    "sales": "30.7",
+    "profits": "4",
+    "country": "ES"
+  }
+]

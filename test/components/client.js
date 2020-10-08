@@ -42,5 +42,8 @@ Client.prototype.getPageData = async function(pageId) {
 Client.prototype.queryData = async function(params) {
   return this.post(`${REST_API_PATH}/data`, params);
 }
+Client.prototype.getBVPageTemplate = async function(pageId) {
+  return this.get(`${REST_API_PATH}/data/template/${pageId}`);
+}
 
 module.exports = Client;

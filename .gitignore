@@ -13,5 +13,5 @@ buildNumber.properties
 /node_modules/
 .DS_Store
 /temp
-test/api/node_modules
-test/ui/node_modules
+node_modules
+test.bak

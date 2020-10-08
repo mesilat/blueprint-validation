@@ -104,6 +104,9 @@ public class DataResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response getTemplate(@PathParam("id") Long pageId) {
         Page page = pageManager.getPage(pageId);
+        if (page == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity(String.format("The page %d could not be found", pageId)).build();
+        }
         return Response.ok(String.format("\"%s\"", page.getProperties().getStringProperty(PROPERTY_TEMPLATE))).build();
     }
 

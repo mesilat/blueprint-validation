@@ -21,10 +21,14 @@ export async function checkLocation() {
     const templateKey = query.get("templateId");
     const spaceKey = query.get("spaceKey");
     const data = { draftId, templateKey, spaceKey };
-    const templateSettings = await getTemplateSetting(templateKey);
-    _.extend(data, templateSettings);
-    trace("nav::checkLocation", data);
-    $(window.document).data(X_VBP_TEMPLATE, data);
+    try {
+      const templateSettings = await getTemplateSetting(templateKey);
+      _.extend(data, templateSettings);
+      trace("nav::checkLocation", data);
+      $(window.document).data(X_VBP_TEMPLATE, data);
+    } catch (err) {
+      // trace(err)
+    }
 
   // Create page from copy
   } else if (window.location.pathname.endsWith("/pages/copypage.action")) {

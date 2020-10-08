@@ -36,11 +36,14 @@ async function init(){
           }
         }
 
-        const templateSettings = await getTemplateSetting(docTemplate.templateKey);
-        $.extend(docTemplate, templateSettings);
-
-        $(document).data(X_VBP_TEMPLATE, docTemplate);
-        trace("edit::init restored X_VBP_TEMPLATE", docTemplate);
+        try {
+          const templateSettings = await getTemplateSetting(docTemplate.templateKey);
+          $.extend(docTemplate, templateSettings);
+          $(document).data(X_VBP_TEMPLATE, docTemplate);
+          trace("edit::init restored X_VBP_TEMPLATE", docTemplate);
+        } catch (err) {
+          // trace(err);
+        }
       }
     } while (false);
 /*

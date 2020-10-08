@@ -1,6 +1,5 @@
 module.exports = {
-  baseaddr: process.env.DEMO_WIKI_HOME,
-  username: process.env.DEMO_WIKI_USER,
-  password: process.env.DEMO_WIKI_PASSWORD,
-  sampleSpace: 'SD123'
+  baseaddr: process.env.TEST_WIKI_HOME,
+  username: process.env.TEST_WIKI_USER,
+  password: process.env.TEST_WIKI_PASSWORD
 }

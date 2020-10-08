@@ -1,7 +1,6 @@
-const options = require('../../.test.settings.js');
-const { delay } = require('../util');
+const { delay } = require('./util');
 
-module.exports = async () => {
+module.exports = async (options) => {
   await page.waitForSelector('#os_username');
   delay(100);
   await page.evaluate((username, password) => {
